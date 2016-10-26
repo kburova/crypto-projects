@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 	
 	aes.setKey(fileSize, key);
 
-//	aes.CBCencrypt();
+	aes.CBCencrypt();
 
 
 	return 0;
