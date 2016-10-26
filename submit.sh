@@ -3,8 +3,8 @@
 make clean
 mv *.txt ../.
 git add -A
-git commit -m "update"
-git push < ../cred.ttt
+git commit -F ../commit.txt
+git push
 mv ../*.txt .
 
 echo "done"
