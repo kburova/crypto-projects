@@ -21,14 +21,14 @@ int main(int argc, char** argv)
 	char *key;				// pointer to the read in key
 	char *message;			// pointer to the message
 	char *cypher;			// pointer to the cypher
-	ifstream in;			//filestream for input
+	ifstream in;			// filestream for input
 	int fileSize;			// size of the file in bytes
 	AES aes;					// creats the AES object
 
 	parameter_check(argc, argv);
 
 	fileSize = open_check(in, argv[3]);
-	cout << "file is " << fileSize*4 << " bytes" << endl;
+
 	// check for proper key size
 	if(fileSize*4 != 256 && fileSize*4 != 192 && fileSize*4 != 128)
 	{
@@ -39,9 +39,6 @@ int main(int argc, char** argv)
 	key = (char*)malloc(sizeof(char)*fileSize+1);
 	in.getline(key,fileSize+1);
 
-	cout << key << endl;
-
-	
 	aes.setKey(fileSize, key);
 
 	aes.CBCencrypt();
