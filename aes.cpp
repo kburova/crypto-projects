@@ -36,8 +36,6 @@ void AES::setKey(int size, char* textKey)
 		textKey[i*2] = 0;
 	}
 
-//	print_hex(key, size/2);
-
 	return;	
 }
 
@@ -73,9 +71,8 @@ char* AES::CBCencrypt(int size, char* input)
 	AES_set_encrypt_key(key, keySize, &AESKey);
 
 	inputPtr = input;
-print_hex(IV,16);
 	// cpy the message into inputBlocks and encrypt them
-	for(i=0; i<numBlocks; i++)
+	for(i=0; i<numBlocks-1; i++)
 	{
 		memcpy(temp,inputPtr,32);
 		inputPtr += 32;
@@ -103,7 +100,6 @@ print_hex(IV,16);
 			}
 		}
 		AES_encrypt(inputBlock, outputBlock, &AESKey);
-print_hex(outputBlock,16);
 		// append the outputBlock to the output stinng
 		for(j=0; j<16 ;j++)
 		{
@@ -111,28 +107,31 @@ print_hex(outputBlock,16);
 		}
 		outputPtr += 32;
 	}
-// create the last block with padding.
+	
+	// create the last block with padding.
 	memcpy(temp,inputPtr, fieldPad);
-	cout << temp << endl;
+	temp[32] = 0;
+	
+	// copy the data
 	for(i = fieldPad/2-1; i >= 0; i--)
 	{
-		cout << i << endl;
 		inputBlock[i] = (unsigned char) strtol(temp+(i*2),NULL,16);
 		temp[i*2] = 0;
 	}
 	inputBlock[15] = padSize;
+	
+	// pad the rest
 	for(i = 14; i > 15-padSize; i--)
 	{
-		cout << i << endl;
 		inputBlock[i] = 0;
 	}
-print_hex(inputBlock,16);
+
 	for(j=0; j<16; j++)
 	{
 		inputBlock[j] = inputBlock[j] ^ outputBlock[j];
 	}
 	AES_encrypt(inputBlock, outputBlock, &AESKey);
-print_hex(outputBlock,16);
+	
 	// append the outputBlock to the output stinng
 	for(j=0; j<16 ;j++)
 	{
@@ -141,9 +140,8 @@ print_hex(outputBlock,16);
 	outputPtr += 32;
 	
 *outputPtr = 0;
-cout << output << endl;
 
-/****************  TESTING *********************/
+/****************  TESTING *********************
 unsigned char inputBlock2[16];
 	AES_set_decrypt_key(key, 128, &AESKey);
 	AES_decrypt(outputBlock, inputBlock2, &AESKey);
@@ -162,7 +160,7 @@ unsigned char inputBlock2[16];
 
 //	cout << tempOut << endl;
 //	print_hex(outputBlock, 16);
-
+***************************************************/
 	return output;
 }
 
