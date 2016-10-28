@@ -16,19 +16,13 @@ AES::AES()
 	int i;
 
 	key[0] = 0;
-
-	message[0] = 1;
-	for(i=1; i<16; i++)
-	{
-		message[i] = 0;
-	}
-	cypher[0] = 0;
+	for(i=0;i<16;i++) inputBlock[i] = 0;
+	for(i=0;i<16;i++) outputBlock[i] = 0;
 }
 
 void AES::setKey(int size, char* textKey)
 {
 	int i;				// loop itterator
-	long temp;
 	keySize = size*4;
 	key[size/2] = 0;
 
@@ -42,68 +36,160 @@ void AES::setKey(int size, char* textKey)
 		textKey[i*2] = 0;
 	}
 
-/*	for (i=0; i<16; i++)
-	{
-		printf("%X", key[i]/16);
-		printf("%X", key[i]%16);
-	}
-	printf("\n");
-*/
+//	print_hex(key, size/2);
 
 	return;	
 }
 
-void AES::CBCencrypt()
+char* AES::CBCencrypt(int size, char* input)
 {
-	int i;
-	cout << "You are in CBCencrypt()" << endl;
+	int i,j;								// loop itterators
+	int fieldPad;						// invers string pad size
+	char temp[33];						// converter string
+	char tempOut[33];					// testing string
+	char* inputPtr;					// points to cur loc in input string
+	char* output;						// return string
+	char* outputPtr;					// points to cur loc in output string
+
+	// determine the number of blocks and the size of the padding
+	padSize = 16-((size%32)/2);
+	numBlocks = (size/32)+1;
+	fieldPad = size%32;
+
+	output = (char*)malloc(((numBlocks+1)*16)+1);
+	outputPtr = output;
 
 	// creates an IV
 	RAND_bytes(IV, sizeof(IV));
 
-	if(AES_set_encrypt_key(key, keySize, &AESKey))
+
+	// insert the IV into the cypher
+	for(i=0; i<16 ;i++)
 	{
-		cout << "ERROR: " << perror;
+   	 sprintf(outputPtr+(i*2), "%02X", IV[i]);
 	}
+	outputPtr += 32;
+
+	AES_set_encrypt_key(key, keySize, &AESKey);
+
+	inputPtr = input;
+print_hex(IV,16);
+	// cpy the message into inputBlocks and encrypt them
+	for(i=0; i<numBlocks; i++)
+	{
+		memcpy(temp,inputPtr,32);
+		inputPtr += 32;
+		temp[32] = 0;
 	
-	AES_encrypt(message, cypher, &AESKey);
-
-	for (i=0; i<16; i++)
-	{
-		printf("%X", cypher[i]/16);
-		printf("%X", cypher[i]%16);
+		// convert the string into hex
+		for(j = 15; j >= 0; j--)
+		{
+			inputBlock[j] = (unsigned char) strtol(temp+(j*2),NULL,16);
+			temp[j*2] = 0;
+		}
+		// if this is the first block
+		if(!i)
+		{
+			for(j=0; j<16; j++)
+			{
+				inputBlock[j] = inputBlock[j] ^ IV[j];
+			}
+		}
+		else
+		{
+			for(j=0; j<16; j++)
+			{
+				inputBlock[j] = inputBlock[j] ^ outputBlock[j];
+			}
+		}
+		AES_encrypt(inputBlock, outputBlock, &AESKey);
+print_hex(outputBlock,16);
+		// append the outputBlock to the output stinng
+		for(j=0; j<16 ;j++)
+		{
+			sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
+		}
+		outputPtr += 32;
 	}
-	printf("\n");
+// create the last block with padding.
+	memcpy(temp,inputPtr, fieldPad);
+	cout << temp << endl;
+	for(i = fieldPad/2-1; i >= 0; i--)
+	{
+		cout << i << endl;
+		inputBlock[i] = (unsigned char) strtol(temp+(i*2),NULL,16);
+		temp[i*2] = 0;
+	}
+	inputBlock[15] = padSize;
+	for(i = 14; i > 15-padSize; i--)
+	{
+		cout << i << endl;
+		inputBlock[i] = 0;
+	}
+print_hex(inputBlock,16);
+	for(j=0; j<16; j++)
+	{
+		inputBlock[j] = inputBlock[j] ^ outputBlock[j];
+	}
+	AES_encrypt(inputBlock, outputBlock, &AESKey);
+print_hex(outputBlock,16);
+	// append the outputBlock to the output stinng
+	for(j=0; j<16 ;j++)
+	{
+		sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
+	}
+	outputPtr += 32;
+	
+*outputPtr = 0;
+cout << output << endl;
 
+/****************  TESTING *********************/
+unsigned char inputBlock2[16];
 	AES_set_decrypt_key(key, 128, &AESKey);
-
-	AES_decrypt(cypher, message2, &AESKey);
-
-	for (i=0; i<16; i++)
+	AES_decrypt(outputBlock, inputBlock2, &AESKey);
+//	print_hex(inputBlock2,16);
+	for(i=0; i<16; i++)
 	{
-		printf("%X", message2[i]/16);
-		printf("%X", message2[i]%16);
+		inputBlock2[i] = inputBlock2[i] ^ IV[i];
 	}
-	printf("\n");
 
-	printf("%s\n",message2);
-	return;
+//	print_hex(inputBlock2,16);
+
+	for(i=0; i<16 ;i++)
+	{
+   	 sprintf(tempOut+(i*2), "%02X", inputBlock2[i]);
+	}
+
+//	cout << tempOut << endl;
+//	print_hex(outputBlock, 16);
+
+	return output;
 }
 
-void AES::CBCdecrypt()
+char* AES::CBCdecrypt(int size, char* input)
 {
 	cout << "You are in CBCdecrypt()" << endl;
-	return;
+	char* output;
+
+
+//	AES_set_decrypt_key(key, 128, &AESKey);
+//	AES_decrypt(outputBlock, inputBlock2, &AESKey);
+//	print_hex(inputBlock2,16);
+//	printf("%s\n",inputBlock2);
+
+	return output;
 }
 
-void AES::CTRencrypt()
+char* AES::CTRencrypt(int size, char* input)
 {
+	char* output;
 	cout << "You are in CTRencrypt()" << endl;
-	return;
+	return output;
 }
 
-void AES::CTRdecrypt()
+char* AES::CTRdecrypt(int size, char* input)
 {
+	char* output;
 	cout << "You are in CTRdecrypt()" << endl;
-	return;
+	return output;
 }

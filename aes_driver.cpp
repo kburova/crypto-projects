@@ -19,8 +19,8 @@ int open_check(ifstream&, char*);
 int main(int argc, char** argv)
 {
 	char *key;				// pointer to the read in key
-	char *message;			// pointer to the message
-	char *cypher;			// pointer to the cypher
+	char *input;			// pointer to the input text string
+	char *output;			// pointer to the output text string
 	ifstream in;			// filestream for input
 	int fileSize;			// size of the file in bytes
 	AES aes;					// creats the AES object
@@ -38,10 +38,17 @@ int main(int argc, char** argv)
 
 	key = (char*)malloc(sizeof(char)*fileSize+1);
 	in.getline(key,fileSize+1);
+	in.close();
 
 	aes.setKey(fileSize, key);
 
-	aes.CBCencrypt();
+	fileSize = open_check(in, argv[4]);
+
+	input = (char*)malloc(sizeof(char)*fileSize+1);
+	in.getline(input,fileSize+1);
+	in.close();
+
+	output = aes.CBCencrypt(fileSize, input);
 
 
 	return 0;
