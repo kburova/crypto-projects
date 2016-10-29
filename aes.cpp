@@ -44,7 +44,6 @@ char* AES::CBCencrypt(int size, char* input)
 	int i,j;								// loop itterators
 	int fieldPad;						// invers string pad size
 	char temp[33];						// converter string
-	char tempOut[33];					// testing string
 	char* inputPtr;					// points to cur loc in input string
 	char* output;						// return string
 	char* outputPtr;					// points to cur loc in output string
@@ -91,6 +90,8 @@ char* AES::CBCencrypt(int size, char* input)
 			{
 				inputBlock[j] = inputBlock[j] ^ IV[j];
 			}
+cout << "post xor     ";
+print_hex(inputBlock,16);
 		}
 		else
 		{
@@ -98,6 +99,8 @@ char* AES::CBCencrypt(int size, char* input)
 			{
 				inputBlock[j] = inputBlock[j] ^ outputBlock[j];
 			}
+cout << "post xor     ";
+print_hex(inputBlock,16);
 		}
 		AES_encrypt(inputBlock, outputBlock, &AESKey);
 		// append the outputBlock to the output stinng
@@ -105,6 +108,8 @@ char* AES::CBCencrypt(int size, char* input)
 		{
 			sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
 		}
+cout << "cypher block ";
+print_hex(outputBlock,16);
 		outputPtr += 32;
 	}
 	
@@ -130,6 +135,8 @@ char* AES::CBCencrypt(int size, char* input)
 	{
 		inputBlock[j] = inputBlock[j] ^ outputBlock[j];
 	}
+cout << "post xor     ";
+print_hex(inputBlock,16);
 	AES_encrypt(inputBlock, outputBlock, &AESKey);
 	
 	// append the outputBlock to the output stinng
@@ -137,6 +144,8 @@ char* AES::CBCencrypt(int size, char* input)
 	{
 		sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
 	}
+cout << "cypher block ";
+print_hex(outputBlock,16);
 	outputPtr += 32;
 	
 *outputPtr = 0;
@@ -166,12 +175,104 @@ unsigned char inputBlock2[16];
 
 char* AES::CBCdecrypt(int size, char* input)
 {
-	cout << "You are in CBCdecrypt()" << endl;
-	char* output;
+	int i, j;							// loop itterators
+	int padSize;						// extracted pad size
+	int inputSize;						// Size of the cypher message
+	int outputSize;					// Size of the resulting message
+	int numBlocks;						// number of blocks
+	char* inputPtr;					// ptr to the current pos in input string
+	char* output;						// output string
+	char* outputPtr;					// ptr to the current pos in the output string
+	char temp[33];						// temp string
+	char storeC[32];					// holds untill next block is deciphered
 
+	AES_set_decrypt_key(key, keySize, &AESKey);
 
-//	AES_set_decrypt_key(key, 128, &AESKey);
-//	AES_decrypt(outputBlock, inputBlock2, &AESKey);
+	inputPtr = input;
+	inputSize = strlen(input);
+	numBlocks = inputSize / 32;
+
+	memcpy(temp, inputPtr, 32);
+	temp[32] = 0;
+	inputPtr += (inputSize - 32);
+	
+	// Extract the IV
+	for(i=15; i>=0; i--)
+	{
+		IV[i] = (unsigned char) strtol(temp+(i*2),NULL,16);
+		temp[i*2] = 0;
+	}
+
+	// copy the data
+	memcpy(temp, inputPtr, 32);
+	temp[32] = 0;
+	inputPtr -= 32;
+cout << "cypher block " << temp << endl;
+	// cast it to a hex value
+	for(j=15; j>=0; j--)
+	{
+		inputBlock[j] = (unsigned char) strtol(temp+(j*2),NULL,16);
+		temp[j*2] = 0;
+	}
+
+	// untill there is only one block left
+	for(i=numBlocks-1; i > 0; i--)
+	{
+		// decrypt the data
+		AES_decrypt(inputBlock, outputBlock, &AESKey);
+cout << "post xor     ";
+print_hex(outputBlock, 16);
+		// and copy the next block of data
+		memcpy(temp, inputPtr, 32);
+		inputPtr -= 32;
+cout << "cypher block " << temp << endl;
+		// and convert it to its hex value
+		for(j=15; j>=0; j--)
+		{
+			inputBlock[j] = (unsigned char) strtol(temp+(j*2),NULL,16);
+			temp[j*2] = 0;
+		}
+		// now we can XOR it with the output returned from the decypher
+		for(j=0; j<16; j++)
+		{
+			outputBlock[j] = outputBlock[j] ^ inputBlock[j];
+		}
+//print_hex(outputBlock,16);
+		// if this is the padded block
+		if(i == numBlocks-1)
+		{
+			padSize = (int)outputBlock[15];
+			if(padSize == 16)
+			{
+				outputSize = ((numBlocks-2) * 32)+1;
+				output = (char*)malloc(outputSize);
+			}
+			else
+			{
+				outputSize = ((numBlocks-2)*32)+(32-(padSize*2))+1;
+				output = (char*)malloc(outputSize);
+			}
+			output[outputSize-1] = 0;
+			outputPtr = output + ((outputSize/32)*32);
+			// copy the padded block into the return string
+			for(j = 0; j < 16-padSize; j++)
+			{
+				sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
+			}
+			outputPtr -= 32;
+		}
+		else
+		{
+			// store the result in the return string		
+			for(j=0; j<16 ;j++)
+			{
+				sprintf(storeC+(j*2), "%02X", outputBlock[j]);
+			}
+			memcpy(outputPtr, storeC, 32);
+			outputPtr -= 32;
+		}
+	}
+
 //	print_hex(inputBlock2,16);
 //	printf("%s\n",inputBlock2);
 

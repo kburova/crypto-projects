@@ -79,7 +79,8 @@ int main(int argc, char** argv)
 		cout << "Error: " << perror << endl;
 		exit(0);
 	}
-	fputs(output, out);
+	fprintf(out,"%s\n",output);
+//	fputs(output, out);
 	fclose(out);
 
 	return 0;
