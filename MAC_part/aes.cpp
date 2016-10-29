@@ -35,6 +35,8 @@ static u_string encode(u_string key, u_string data)
 	EVP_CIPHER_CTX_set_padding(&ctx, false);
 	unsigned char buffer[1024], *pointer = buffer;
 	int outlen;
+//	std::cout << "key: "<<(char*)key.c_str()<<"\ndata: "<<(char*)data.c_str()<<std::endl; 
+//	std::cout << data.length() << std::endl;
 	EVP_EncryptUpdate (&ctx, pointer, &outlen, data.c_str(), data.length()) or ABORT();
 	pointer += outlen;
 	EVP_EncryptFinal_ex(&ctx, pointer, &outlen) or ABORT();
