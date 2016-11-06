@@ -1,11 +1,15 @@
 #!/bin/bash
 
+cd AES_part
 make clean
-mv *.txt ../.
+cd ..
+cd MAC_part
+make clean
+cd ..
+cd RSA_part
+make clean
+cd ..
 git add -A
-git reset HEAD *.swp
-git commit -F ../commit.txt
+git commit -F commit.txt
 git push
-mv ../*.txt .
-
 echo "done"
