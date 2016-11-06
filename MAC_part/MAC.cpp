@@ -1,156 +1,177 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
-#include <vector>
-#include <cstring>
 #include <cstdio>
 #include <cstdlib>
-#include <openssl/aes.h>
-#include <openssl/evp.h>
-#include <openssl/md5.h>
 #include <fstream>
-#include <sstream>
-#include "aes.cpp"
+#include <openssl/evp.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+#include <openssl/aes.h>
+#include <openssl/md5.h>
+
+typedef std::basic_string<unsigned char> u_string;
+#define ABORT() (fprintf(stderr, "%s\nAborting in %s at %s:%d\n", ERR_error_string(ERR_get_error(), NULL), __PRETTY_FUNCTION__, __FILE__, __LINE__), abort(), 0)
 using namespace std;
 
-const int KEY_SIZE = 32;
-//typedef std::basic_string<unsigned char> u_string;
-
-void processBlock(unsigned char * key, 
-				  unsigned char * block){
-	u_string c;
-	printf("Before aes : ");
-	for (int i = 0; i < 16;i++){
-		printf("%02x",block[i]);
-	}
-	printf ("\n");
-	c = (unsigned char *)encode(key, block).c_str();
-
-
-	printf("After aes  : ");
-	for (int i = 0; i < 16;i++){
-		printf("%02x",c[i]);
-		block[i] = c[i];
-	}
-	printf ("\n\n");
+/****   AES ECB unpadded mode, we process 1 block of 128 bit data   ****/
+void encodeBlock(string & key, string & data, string & block)
+{
+	EVP_CIPHER_CTX ctx;
+	EVP_CIPHER_CTX_init(&ctx);
+	EVP_EncryptInit_ex (&ctx, EVP_aes_128_ecb(), NULL, (unsigned char*) key.c_str(), NULL);
+	EVP_CIPHER_CTX_set_padding(&ctx, false);
+	unsigned char buffer[1024], *pointer = buffer;
+	int outlen;
+	EVP_EncryptUpdate (&ctx, pointer, &outlen,(unsigned char*) data.c_str(), data.length()) or ABORT();
+	pointer += outlen;
+	EVP_EncryptFinal_ex(&ctx, pointer, &outlen) or ABORT();
+	pointer += outlen;
+	u_string temp = u_string(buffer, pointer-buffer);
+	memcpy(&block, &temp, 17);
 }
 
-void CBCGen(unsigned char * key, 
-			unsigned char * message,
-			int MES_SIZE,
-			unsigned char * IV,
-			unsigned char * tag){
+void CBCGen( string & key,
+			 string & message,
+			 int & MES_SIZE,
+			 string & IV,
+			 string & tag){
 
 	int i,j;
 	int lastBlockSize = MES_SIZE % 16;
-	int d = MES_SIZE/16;
+	int d = MES_SIZE / 16;
+	string returnBlock = "";
+	returnBlock.resize(16);
 
-	unsigned char CurrentState[17];
-	for ( i = 0; i < 16; i++ ){
-		CurrentState[i] = IV[i];
+	string Block = "";
+	Block = IV;
+
+	/****	XOR 4 first bytes of current state with message
+		 	size, and last 12 with padding 0x0C or in other
+			words, pad message size with 'padding size' char
+			to block size and XOR with current state         ****/
+	printf("Block  %d in: ",0);
+	for (i = 0; i < 4; i++){
+		Block[i] =(unsigned char)( Block[i] ^ ((MES_SIZE >> i*8) & 0xff));
+		printf("%02x", (unsigned int)(unsigned char)Block[i]);
 	}
-	CurrentState[16] = '\0';
-
-	// XOR 4 first bytes of current state with message //
-	// size, and last 12 with padding 0x0C or in other //
-	// words, pad message size with 'padding size' char//
-	// to block size and XOR with current state        //
-
-	printf("Mes Block %d: ", 0);
-	for (i = 0; i < 1; i++){
-		CurrentState[i] ^= ((MES_SIZE >> i*8) & 0xff);
-		printf("%02x", CurrentState[i]);
-		//	printf("i: %02x\n",((MES_SIZE >> i*8) & 0xff) );	
-	}
-	for (i = 1; i < 16; i++){
-		CurrentState[i] ^= 0x0C;
-		printf("%02x", CurrentState[i]);
-		//	printf("i: %02x\n", CurrentState[i]);
+	for (i = 4; i < 16; i++){
+		Block[i] = (unsigned char)(Block[i] ^ 0x0C);
+		printf("%02x",(unsigned int)(unsigned char) Block[i]);
 	}
 	cout<<endl;
-	//	printf("i: %08x\n", MES_SIZE);	
-	//printf("1st block: %s\nsize of block: %lu\n", CurrentState, strlen((const char*)CurrentState));	
-	processBlock((unsigned char*)key,(unsigned char*)CurrentState);
 
-	// for each block XOR Current state with message //
-	// and run result through Pseudorand F_k, output //
-	// new current state						     //
+	encodeBlock(key, Block, returnBlock);
+	memcpy(&Block, &returnBlock, 17);
+
+	printf("Block  %d out: ", 0);
+	for (char r: Block) printf("%02x",(unsigned int)(unsigned char) r);
+	cout << endl;
+	cout << endl;
+
+	/****	for each block XOR Current state with message
+			and run result through Pseudorand F_k, output
+			new current state						     ****/
 
 	for ( i = 0; i < d; i++){
-		printf("Mes Block %d: ",i+1);
+
+		printf("Block   %d in: ",i+1);
+		for (char r: Block) printf("%02x",(unsigned int)(unsigned char) r);
+		cout << endl;
+		printf("Message %d in: ", i+1);
+		for (j = 0; j < 16; j++) printf("%02x",(unsigned int)(unsigned char) message[i*16 + j]);
+		cout << endl;
+		printf("M XOR B %d in: ", i+1);
+
 		for ( j = 0; j < 16; j++){
-			CurrentState[j] ^= message[i*16 + j];
-			printf("%02x",message[i*16 + j]);
+			//printf("%02x",(unsigned int)(unsigned char) Block[i*16 + j]);
+			Block[j] = (unsigned char)(Block[j] ^ (message[i*16 + j] & 0xff));
+			printf("%02x",(unsigned int)(unsigned char) Block[j]);
 		}
 		printf("\n");
-		processBlock((unsigned char*)key,(unsigned char*)CurrentState);
+		encodeBlock(key, Block, returnBlock);
+		memcpy(&Block, &returnBlock, 17);
+
+
+		printf("Block  %d out: ", i+1);
+		for (char r: Block) printf("%02x",(unsigned int)(unsigned char) r);
+		cout << endl;
+		cout << endl;
 	}
 
-	if (lastBlockSize != 0){
-		for ( j = 0; j < lastBlockSize; j++){
-			CurrentState[j] ^= message[i*16 + j];
-		}
-		for (j = lastBlockSize; j < 16; j++){
-			CurrentState[j] ^= (16-lastBlockSize);
-		}
-		processBlock(key,CurrentState);
+	/****   Process last block that has padding or that is padding only *****/
+	printf("Block   %d in: ",i+1);
+	for (char r: Block) printf("%02x",(unsigned int)(unsigned char) r);
+	cout << endl;
+	printf("Message %d in: ",i+1);
+	for ( j = 0; j < lastBlockSize; j++){
+		printf("%02x", (unsigned int)(unsigned char)message[i*16 + j]);
+		Block[j] ^= message[i*16 + j];
 	}
+	for (j = lastBlockSize; j < 16; j++){
+		int padSize = 16-lastBlockSize;
+		printf("%02x", padSize);
+		Block[j] ^= (padSize & 0xff);
+		//printf("%02x", (unsigned int)(unsigned char)Block[i*16 + j]);
+	}
+	cout <<endl;
+	encodeBlock(key, Block, returnBlock);
+	memcpy(&Block, &returnBlock, 17);
 
-	for ( i = 0; i < 16; i++ ){
-		tag[i]=CurrentState[i];
+	printf("Block  %d out: ", i+1);
+	for (char r: Block) printf("%02x",(unsigned int)(unsigned char) r);
+	cout << endl;
+	tag = Block;
+}
+
+void HashMacGen(string & Key,
+				string & Message,
+				int & MES_SIZE,
+				string & Tag){
+
+	unsigned char hash[MD5_DIGEST_LENGTH];
+	string Block = "";
+
+	/*** calculate hash of message  and feed it into AES enc function ***/
+	MD5((const unsigned char*)Message.c_str(), MES_SIZE, hash);
+
+	printf( "Hash:    ");
+	//cout << "Hash size: " << sizeof(hash) << endl;
+	//memcpy(&Block, &hash, 17);
+	for (unsigned char c : hash){
+		printf("%02x", (unsigned int)c);
+		Block+=c;
 	}
-	tag[16]='\0';
+	cout << endl;
+	encodeBlock(Key, Block, Tag);
+	//printf ("Tag: %s\n", Tag.c_str());
 
 }
 
-void HashMacGen(unsigned char * key,
-				unsigned char * message,
-				int MES_SIZE,
-				unsigned char * tag){
-
-	unsigned char hash[MD5_DIGEST_LENGTH+1];
-	u_string c;
+bool HashMacVer( string & key,
+				 string & message,
+				 int & MES_SIZE,
+				 string & tag){
 	
-	MD5(message, MES_SIZE, hash);
-	hash[MD5_DIGEST_LENGTH] = '\0';
-	cout << "Message size: " << MES_SIZE << endl;
-	cout << "hash: "<< hash <<endl;
-	cout << "Hash size: " << sizeof(hash) << endl;
-
-	c = (unsigned char *)encode((unsigned char*)key, (unsigned char*)hash).c_str();
-	for (int i = 0; i<16; i++){
-		tag[i] = c[i];
-	}
-	tag[16]='\0';
-}
-
-bool HashMacVer( unsigned char * key,
-				 unsigned char * message,
-				 int MES_SIZE,
-				 unsigned char * tag){
-	
-	unsigned char tagToVerify[17];
+	string tagToVerify;
 	HashMacGen(key, message, MES_SIZE, tagToVerify);
 
-	if (strcmp((const char*)tag,(const char*)tagToVerify) == 0)
+	if (tag == tagToVerify)
 		return 1;
 
 	return 0;
 }
 
-bool CBCVer(unsigned char * key, 
-			unsigned char * message,
-			int MES_SIZE,
-			unsigned char * IV,
-			unsigned char * tag){
-	
-	unsigned char tagToVerify[17];
-	CBCGen(key, message, MES_SIZE,IV, tagToVerify);
+bool CBCVer( string & key,
+			string & message,
+			int & MES_SIZE,
+			string & IV,
+			string & tag){
 
-//	printf("Tag in the file: %s\n", tag);
-//	printf("Tag to verify  : %s\n", tagToVerify);
-	
-	if (strcmp((const char*)tag,(const char*)tagToVerify) == 0) 
+	string tagToVerify;
+	CBCGen(key, message, MES_SIZE, IV, tagToVerify);
+
+	if (tag == tagToVerify)
 		return 1;
 
 	return 0;
@@ -161,106 +182,108 @@ int main(int argc, char** argv){
 
 	ifstream M_file,K_file;
 	fstream T_file;
-	string k, m, temp;
-	int i,j, MES_SIZE;
-	int mode, task;
+	int i, j, MES_SIZE, KEY_SIZE, mode, task;
+	string k, m, temp, IV = "", Key = "", Message = "", Tag = "";
 
-	unsigned char key[KEY_SIZE+1];
-	unsigned char tag[16+1];
+	if (argc !=4 ){
+		fprintf(stderr, "Usage: mac [key_file] [message_file] [tag_file]");
+		exit(1);
+	}
 
-	//    Read the key and message from the files    //
+	/****  Read the key and message from the files   ****/
 
 	K_file.open(argv[1]);
 	if (K_file.fail()){
 		fprintf(stderr, "Couln't open key file -- %s\n", argv[1]);
 		exit(1);
 	}
-	K_file >> k;
-	K_file.close();	
-	printf("Read key: %s\n", k.c_str());
-
-	M_file.open(argv[2]);
-	if (M_file.fail()){
-		fprintf(stderr, "Couln't open message file -- %s\n", argv[2]);
+	if (K_file >> k) {
+		KEY_SIZE = k.size()/2;
+		if (KEY_SIZE != 16 and KEY_SIZE != 24 and KEY_SIZE != 32){
+			fprintf(stderr,"Wrong key size: should be 128, 192 or 256 bits\n");
+			exit(1);
+		}
+		printf("Read key...Success\n");
+	}else{
+		fprintf(stderr,"Read key...Fail\n");
 		exit(1);
 	}
-	M_file >> m;
-	M_file.close();
-	printf("Read message: %s\n", m.c_str());
+	M_file.open(argv[2]);
+	if (M_file.fail()){
+		fprintf(stderr, "Couldn't open message file -- %s\n", argv[2]);
+		exit(1);
+	}
+	if (M_file >> m) {
+		MES_SIZE = m.size()/2;
+		printf("Read message...Success\n");
+	}else{
+		fprintf(stderr,"Read message...Fail\n");
+		exit(1);
+	}
 
-	MES_SIZE = m.size()/2;
-	unsigned char message[MES_SIZE+1];
-
-	//    Convert hex strings to actual hex values   // 
+	/****  Convert hex strings to actual hex values   ****/
 	
 	for (i = 0; i < KEY_SIZE; i++){
 		temp = k.substr(i*2,2);
-		key[i]=strtol(temp.c_str(),NULL,16);
+		Key += strtol(temp.c_str(),NULL,16);
 	}
-	
-	key[KEY_SIZE] = '\0';
-	printf("Convert key: %s\n", key);
+	printf("Converted key: \"%s\"\n", Key.c_str());
+
 	for (i = 0; i < MES_SIZE; i++){
 		temp = m.substr(i*2,2);
-		message[i]=strtol(temp.c_str(),NULL,16);
+		Message += strtol(temp.c_str(),NULL,16);
 	}
-	message[MES_SIZE] = '\0';
-	printf("Convert message: %s\n", message);
+	printf("Converted message: \"%s\"\n", Message.c_str());
 
-	//   set IV to all 0's since no need for MAC   //
-	unsigned char IV[17] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,'\0'};
+	/****  set IV to all 0's since no need for MAC   ****/
 
-	printf("IV: %s\n", IV);
+	for (i = 0; i < 16; i++) IV += '\0';
 
-	//   open Tag file to write to OR to read from  //
+	/****   open Tag file to write to OR to read from   ****/
+
 	T_file.open(argv[3]);
 	if (T_file.fail()){
 		fprintf(stderr, "Couln't open file for tag -- %s\n", argv[3]);
 		exit(1);
 	}
 
-
-
-	// Ask user for a choice of mode and task //
+	/**** Ask user for a choice of mode and task   ****/
 
 	cout << "Select CBC-MAC or Hash-and-MAC" << endl
 		<<"Type 1 for CBC-MAC or 2 for Hash-and-MAC : ";
 	cin >> mode;
 	cout << "Type 1 Tag Generation or type 2 for for Verification : ";
 	cin >> task;
+	cout << endl;
 
 	if (task == 1){
 
 		char temp[3];
 
 		if (mode == 1){
-	// CBC-MAC tag generation mode //
-			CBCGen(key,message,MES_SIZE,IV,tag);
+			CBCGen(Key,Message,MES_SIZE,IV,Tag);
 		}else{
-	// Hash-and-MAC tag generation mode //
-			HashMacGen(key,message,MES_SIZE,tag);
+			HashMacGen(Key,Message,MES_SIZE,Tag);
 		}
 
 		for (i = 0; i < 16; i++){
-			sprintf( temp, "%02x", IV[i] );
+			sprintf( temp, "%02x", (unsigned char)(unsigned int)IV[i] );
 			T_file << temp;
 		}
 		printf("Tag:     "); 
 		for (i = 0; i < 16; i++){
-			printf("%02x",tag[i]);
-			sprintf( temp, "%02x", tag[i] );
+			printf("%02x",(unsigned char)(unsigned int)Tag[i]);
+			sprintf( temp, "%02x",  (unsigned char)(unsigned int)Tag[i] );
 			T_file << temp;
 		}
 		cout << endl;
-		T_file.close();
 
 	}else if (task == 2){
-		
+
 		bool isValid;
 		string t;
 
 		T_file >> t;
-		T_file.close();
 		printf("Read tag: %s\n", t.c_str());
 
 		if (t.size() != 64){
@@ -270,17 +293,22 @@ int main(int argc, char** argv){
 
 		for (i = 0; i < 16; i++){
 			temp = t.substr(i*2+32,2);
-			tag[i]=strtol(temp.c_str(),NULL,16);
+			Tag += strtol(temp.c_str(),NULL,16);
 		}
-		tag[16] = '\0';
-		printf("Convert tag: %s\n", key);
+
 
 		if (mode ==1){
-			isValid = CBCVer(key, message, MES_SIZE,IV,tag);
+			isValid = CBCVer(Key, Message, MES_SIZE,IV,Tag);
 		}else{
-			isValid = HashMacVer(key, message, MES_SIZE,tag);
+			isValid = HashMacVer(Key, Message, MES_SIZE,Tag);
 		}
 		printf ("%s\n", (isValid ? "***Tag is valid***" : "***Tag is NOT valid***"));
+
 	}
+
+	K_file.close();
+	M_file.close();
+	T_file.close();
+
 	return 0;
 }
