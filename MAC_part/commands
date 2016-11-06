@@ -1,2 +1,1 @@
-g++ -g3 -ggdb -O0 -DDEBUG -I/usr/include/cryptopp ecb.cpp -o ecb.exe -lcryptopp -lpthread
- g++ aes.cpp -lcrypto -lssl -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib
+g++ -o mac MAC.cpp -lcrypto -lssl -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib
