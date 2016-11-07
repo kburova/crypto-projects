@@ -1,1 +1,1 @@
-g++ -o mac MAC.cpp -lcrypto -lssl -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib
+g++ -o mac MAC.cpp -std=c++11 -lcrypto -lssl -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib

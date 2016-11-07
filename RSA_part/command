@@ -1,0 +1,1 @@
+g++ -o rsa main.cpp -std=c++11 -lcrypto -lssl -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib
