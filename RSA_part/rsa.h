@@ -2,17 +2,22 @@
 #define RSA_H
 
 #include<string>
+#include<openssl/bn.h>
 
 using namespace std;
 
 class RSA_obj
 {
-public:
+private:
 // variables
-	
+	unsigned long n;
+	BIGNUM N;
+	BIGNUM key;
+public:	
 // functions
-	void RSAEncrypt(string);
-	void RSADecrypt(string);
+	RSA_obj();
+	void RSAEncrypt(string, string, string);
+	void RSADecrypt(string, string, string);
 	void openKeyFile(string&);
 };
 

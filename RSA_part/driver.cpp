@@ -9,11 +9,18 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+
 	RSA_obj rsa;
-	string fileName;
 
-	fileName = "PK";
+	string key;
+	string message;
+	string cypher;
 
-	rsa.RSAEncrypt(fileName);
+	key = "PK";
+	message = "message.txt";
+	cypher = "cypher.txt";
+	
+
+	rsa.RSAEncrypt(key, message, cypher);
 	return 0;
 }
