@@ -34,6 +34,8 @@ int main(int argc, char** argv)
 	// check for proper key size
 	if(fileSize*4 != 256 && fileSize*4 != 192 && fileSize*4 != 128)
 	{
+		cout << "file size = " << fileSize << endl;
+		cout << "key size = " << fileSize * 4 << endl;
 		cout << "\nError: Improper key size\n\n";
 		exit(0);
 	}
