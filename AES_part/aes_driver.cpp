@@ -10,6 +10,7 @@ using std::endl;
 using std::strcpy;
 using std::strcmp;
 using std::ifstream;
+using std::ofstream;
 
 void parameter_check(int, char**);
 void print_usage();
@@ -19,9 +20,10 @@ int open_check(ifstream&, char*);
 int main(int argc, char** argv)
 {
 	char *key;				// pointer to the read in key
-	char *message;			// pointer to the message
-	char *cypher;			// pointer to the cypher
+	char *input;			// pointer to the input text string
+	char* output;			// pointer to the output text string
 	ifstream in;			// filestream for input
+	FILE* out;				// filestream for output
 	int fileSize;			// size of the file in bytes
 	AES aes;					// creats the AES object
 
@@ -38,11 +40,48 @@ int main(int argc, char** argv)
 
 	key = (char*)malloc(sizeof(char)*fileSize+1);
 	in.getline(key,fileSize+1);
+	in.close();
 
 	aes.setKey(fileSize, key);
 
-	aes.CBCencrypt();
+	fileSize = open_check(in, argv[4]);
 
+	input = (char*)malloc(sizeof(char)*fileSize+1);
+	in.getline(input,fileSize+1);
+	in.close();
+	
+	if(strcmp(argv[1], "-cbc")==0)
+	{
+		if(strcmp(argv[2], "-e")==0)
+		{
+			output = aes.CBCencrypt(fileSize, input);
+		}
+		else
+		{
+			output = aes.CBCdecrypt(fileSize, input);
+		}
+	}
+	else
+	{
+		if(strcmp(argv[2], "-e")==0)
+		{
+			output = aes.CTRencrypt(fileSize, input);
+		}
+		else
+		{
+			output = aes.CTRdecrypt(fileSize, input);
+		}
+	}
+
+	out = fopen(argv[5], "w");
+	if(out == NULL)
+	{
+		cout << "Error: " << perror << endl;
+		exit(0);
+	}
+	fprintf(out,"%s\n",output);
+//	fputs(output, out);
+	fclose(out);
 
 	return 0;
 }
