@@ -7,7 +7,7 @@ rsa: driver.o rsa.o
 all: rsa keygen
 
 clean:
-	rm -f *.o testing a.out KeyGen rsa
+	rm -f *.o testing a.out keygen rsa
 
 keygen: main.o KeyGen.o
 	$(CC) -o keygen main.o KeyGen.o $(FLAGS)
