@@ -1,6 +1,6 @@
 # cosc483-pa23-27
 
-### Compiling
+## Compiling
 
 To compile use
 
@@ -16,18 +16,17 @@ To compile program individually use
     make bin/aes
     make bin/rsa
     make bin/mac
-----
-### Directory layout.
-All programs are found in the bin/ folder.
+## Directory layout.
 
-All object files are found in the obj/ folder.
+All programs are found in the `bin/` folder.
 
-All header file are found in the include/ folder.
+All object files are found in the `obj/` folder.
 
-All supporting files are found in the files/ folder
+All header file are found in the `include/` folder.
 
-----
-### Programs
+All supporting files are found in the `files/` folder...
+
+## Programs
 AES can be ran with
 
     bin/aes [MODE] [OPTION] [KEY_FILE] [IMPUT_FILE] [OUTPUT_FILE]
@@ -37,11 +36,11 @@ An example mignt be
     bin/aes -cbc -d files/key.txt files/cypher.txt files/message2.txt
 These two commands would encrypt `-e` the message `files/message.txt` using CBC `-cbc` using the key in file `files/key.txt` and placing the cypher in `files/cypher.txt`.  Decrypting would be similar only using the `-d` flag and the input file this time should be the cypher file `files/cypher.txt` and the output file will be the resulting message `files/message2.txt`.  YOu can get a help message with a discription of all the flags and modes using the `--help` flag.
 
------
+------
 
 MAC can be ran with
 
-----
+-----
 
 RSA can be ran with
 
