@@ -5,7 +5,7 @@ OBJ = obj
 SRC = src
 FLAGS = -lssl -lcrypto -I$(INC)
 DIR = /usr/local/opt/openssl
-MAC = -std=c++11 -lcrypto -lssl
+MAC = -std=c++11 -lcrypto -lssl -I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib
 
 all: $(BIN)/rsa $(BIN)/aes $(BIN)/mac
 
@@ -34,4 +34,4 @@ $(OBJ)/aes.o: $(SRC)/aes.cpp $(INC)/aes.h
 	$(CC) -c -g -O0 -o $(OBJ)/aes.o $(SRC)/aes.cpp $(FLAGS)
 
 $(BIN)/mac: $(SRC)/MAC.cpp
-	$(CC) -o $(BIN)/mac $(MAC)
+	$(CC) -o $(BIN)/mac $(SRC)/MAC.cpp $(MAC)
