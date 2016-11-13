@@ -1,8 +1,8 @@
 CC = c++
 FLAGS = -lssl -lcrypto
 
-rsa: driver.o rsa.o
-	$(CC) -o rsa driver.o rsa.o $(FLAGS)
+rsa: main.o rsa.o KeyGen.o
+	$(CC) -o rsa main.o rsa.o KeyGen.o $(FLAGS)
 
 all: rsa keygen
 

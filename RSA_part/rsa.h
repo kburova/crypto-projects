@@ -10,8 +10,8 @@ class RSA_obj
 {
 private:
 // variables
-	unsigned long n;
-	BIGNUM N;
+	unsigned long n;						// Secutity parameter in bits
+	BIGNUM N;								//
 	BIGNUM key;
 public:	
 // functions
