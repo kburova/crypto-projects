@@ -3,5 +3,6 @@ bin/*
 obj/*
 !obj/.keep
 */*.swp
+.swp
 .vscode
 commit.txt
