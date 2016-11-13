@@ -5,7 +5,7 @@ OBJ = obj
 SRC = src
 FLAGS = -lssl -lcrypto -I$(INC)
 DIR = /usr/local/opt/openssl
-MAC = -std=c++11 -lcrypto -lssl -I$(DIR)/include -L$(DIR)/lib
+MAC = -std=c++11 -lcrypto -lssl
 
 all: $(BIN)/rsa $(BIN)/aes $(BIN)/mac
 
