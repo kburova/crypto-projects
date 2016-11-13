@@ -1,10 +1,12 @@
 #include<fstream>
 #include<iostream>
+#include<string>
 #include<cstdio>
 #include<cstdlib>
 #include<cstring>
 #include"aes.h"
 
+using std::string;
 using std::cout;
 using std::endl;
 using std::strcpy;
@@ -21,9 +23,10 @@ int main(int argc, char** argv)
 {
 	char *key;				// pointer to the read in key
 	char *input;			// pointer to the input text string
-	char* output;			// pointer to the output text string
+	char *output;			// pointer to the output text string
 	ifstream in;			// filestream for input
-	FILE* out;				// filestream for output
+	ofstream out;			// filestream for output
+//	FILE* out;				// filestream for output
 	int fileSize;			// size of the file in bytes
 	AES aes;					// creats the AES object
 
@@ -47,7 +50,6 @@ int main(int argc, char** argv)
 	aes.setKey(fileSize, key);
 
 	fileSize = open_check(in, argv[4]);
-
 	input = (char*)malloc(sizeof(char)*fileSize+1);
 	in.getline(input,fileSize+1);
 	in.close();
@@ -75,15 +77,15 @@ int main(int argc, char** argv)
 		}
 	}
 
-	out = fopen(argv[5], "w");
-	if(out == NULL)
+	out.open(argv[5], out.out);
+	if(out.fail())
 	{
 		cout << "Error: " << perror << endl;
 		exit(0);
 	}
-	fprintf(out,"%s\n",output);
-//	fputs(output, out);
-	fclose(out);
+
+	out << output;
+	out.close();
 
 	return 0;
 }
@@ -144,7 +146,7 @@ Returns:
 
 int open_check(ifstream& in, char* file)
 {
-	int size = 0;
+	string check;
 
 	in.open(file);
 
@@ -154,17 +156,15 @@ int open_check(ifstream& in, char* file)
 		exit(0);
 	}
 
-	in.seekg (0, in.end);
-	size = in.tellg();
+	in >> check;
 	in.seekg (0, in.beg);
 
-	if(!size)
+	if(!check.size())
 	{
 		cout << "\nError: File is empty\n\n";
 		exit(0);
 	}
-
-	return size-1;
+	return check.size();
 }
 
 /*****************************************************************************

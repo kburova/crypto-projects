@@ -1,5 +1,7 @@
-*/*.txt
-*.txt
+bin/*
+!bin/.keep
+obj/*
+!obj/.keep
 */*.swp
-test*
 .vscode
+commit.txt

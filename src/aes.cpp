@@ -1,4 +1,6 @@
 #include<cstdio>
+#include<fstream>
+#include<string>
 #include<cstring>
 #include<cstdlib>
 #include<iostream>
@@ -6,6 +8,8 @@
 #include<openssl/rand.h>
 #include"aes.h"
 
+using std::ofstream;
+using std::string;
 using std::strcpy;
 using std::cout;
 using std::endl;
@@ -48,12 +52,14 @@ char* AES::CBCencrypt(int size, char* input)
 	char* output;						// return string
 	char* outputPtr;					// points to cur loc in output string
 
+
 	// determine the number of blocks and the size of the padding
 	padSize = 16-((size%32)/2);
 	numBlocks = (size/32)+1;
 	fieldPad = size%32;
 
-	output = (char*)malloc(((numBlocks+1)*16)+1);
+	output = (char*)malloc(((numBlocks+1)*32)+1);
+
 	outputPtr = output;
 
 	// creates an IV
@@ -90,8 +96,6 @@ char* AES::CBCencrypt(int size, char* input)
 			{
 				inputBlock[j] = inputBlock[j] ^ IV[j];
 			}
-cout << "post xor     ";
-print_hex(inputBlock,16);
 		}
 		else
 		{
@@ -99,8 +103,6 @@ print_hex(inputBlock,16);
 			{
 				inputBlock[j] = inputBlock[j] ^ outputBlock[j];
 			}
-cout << "post xor     ";
-print_hex(inputBlock,16);
 		}
 		AES_encrypt(inputBlock, outputBlock, &AESKey);
 		// append the outputBlock to the output stinng
@@ -108,8 +110,6 @@ print_hex(inputBlock,16);
 		{
 			sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
 		}
-cout << "cypher block ";
-print_hex(outputBlock,16);
 		outputPtr += 32;
 	}
 	
@@ -135,8 +135,6 @@ print_hex(outputBlock,16);
 	{
 		inputBlock[j] = inputBlock[j] ^ outputBlock[j];
 	}
-cout << "post xor     ";
-print_hex(inputBlock,16);
 	AES_encrypt(inputBlock, outputBlock, &AESKey);
 	
 	// append the outputBlock to the output stinng
@@ -144,32 +142,10 @@ print_hex(inputBlock,16);
 	{
 		sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
 	}
-cout << "cypher block ";
-print_hex(outputBlock,16);
+
 	outputPtr += 32;
-	
-*outputPtr = 0;
+	*outputPtr = 0;
 
-/****************  TESTING *********************
-unsigned char inputBlock2[16];
-	AES_set_decrypt_key(key, 128, &AESKey);
-	AES_decrypt(outputBlock, inputBlock2, &AESKey);
-//	print_hex(inputBlock2,16);
-	for(i=0; i<16; i++)
-	{
-		inputBlock2[i] = inputBlock2[i] ^ IV[i];
-	}
-
-//	print_hex(inputBlock2,16);
-
-	for(i=0; i<16 ;i++)
-	{
-   	 sprintf(tempOut+(i*2), "%02X", inputBlock2[i]);
-	}
-
-//	cout << tempOut << endl;
-//	print_hex(outputBlock, 16);
-***************************************************/
 	return output;
 }
 
@@ -207,7 +183,7 @@ char* AES::CBCdecrypt(int size, char* input)
 	memcpy(temp, inputPtr, 32);
 	temp[32] = 0;
 	inputPtr -= 32;
-cout << "cypher block " << temp << endl;
+
 	// cast it to a hex value
 	for(j=15; j>=0; j--)
 	{
@@ -220,12 +196,11 @@ cout << "cypher block " << temp << endl;
 	{
 		// decrypt the data
 		AES_decrypt(inputBlock, outputBlock, &AESKey);
-cout << "post xor     ";
-print_hex(outputBlock, 16);
+
 		// and copy the next block of data
 		memcpy(temp, inputPtr, 32);
 		inputPtr -= 32;
-cout << "cypher block " << temp << endl;
+
 		// and convert it to its hex value
 		for(j=15; j>=0; j--)
 		{
@@ -237,7 +212,7 @@ cout << "cypher block " << temp << endl;
 		{
 			outputBlock[j] = outputBlock[j] ^ inputBlock[j];
 		}
-//print_hex(outputBlock,16);
+
 		// if this is the padded block
 		if(i == numBlocks-1)
 		{
@@ -273,9 +248,6 @@ cout << "cypher block " << temp << endl;
 		}
 	}
 
-//	print_hex(inputBlock2,16);
-//	printf("%s\n",inputBlock2);
-
 	return output;
 }
 
@@ -293,14 +265,11 @@ char* AES::CTRencrypt(int size, char* input)
 	numBlocks = (size/32)+1;
 	fieldPad = size%32;
 
-	output = (char*)malloc(((numBlocks+1)*16)+1);
+	output = (char*)malloc(((numBlocks+1)*32)+1);
 	outputPtr = output;
 
 	// creates an IV
 	RAND_bytes(IV, sizeof(IV));
-
-cout << "IV           ";
-print_hex(IV, 16);
 
 	// insert the IV into the cypher
 	for(i=0; i<16 ;i++)
@@ -330,9 +299,6 @@ print_hex(IV, 16);
 		{
 			inputBlock[j] = inputBlock[j] ^ IV[j];
 		}
-cout << "post xor     ";
-print_hex(inputBlock,16);
-
 		// incrament IV
 		for(j=15; j>=0; j--)
 		{
@@ -344,8 +310,6 @@ print_hex(inputBlock,16);
 				break;
 			}
 		}
-cout << "IV           ";
-print_hex(IV, 16);
 
 		AES_encrypt(inputBlock, outputBlock, &AESKey);
 
@@ -354,15 +318,12 @@ print_hex(IV, 16);
 		{
 			sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
 		}
-cout << "cypher block ";
-print_hex(outputBlock,16);
 		outputPtr += 32;
 	}
 	
 	// create the last block with padding.
 	memcpy(temp,inputPtr, fieldPad);
 	temp[32] = 0;
-cout << "temp         " <<  temp << endl;
 	
 	// copy the data
 	for(i = fieldPad/2-1; i >= 0; i--)
@@ -377,15 +338,11 @@ cout << "temp         " <<  temp << endl;
 	{
 		inputBlock[i] = 0;
 	}
-cout << "after pad    ";
-print_hex(inputBlock,16);
 
 	for(j=0; j<16; j++)
 	{
 		inputBlock[j] = inputBlock[j] ^ IV[j];
 	}
-cout << "post xor     ";
-print_hex(inputBlock,16);
 	AES_encrypt(inputBlock, outputBlock, &AESKey);
 	
 	// append the outputBlock to the output stinng
@@ -393,8 +350,6 @@ print_hex(inputBlock,16);
 	{
 		sprintf(outputPtr+(j*2), "%02X", outputBlock[j]);
 	}
-cout << "cypher block ";
-print_hex(outputBlock,16);
 	outputPtr += 32;
 	*outputPtr = 0;
 
@@ -433,9 +388,6 @@ char* AES::CTRdecrypt(int size, char* input)
 	}
 	memcpy(CTR,IV,16);
 
-cout << "CTR          ";
-print_hex(CTR,16);
-
 	// incrament CTR to extract last block
 	if(255-CTR[15] < numBlocks-2)
 	{
@@ -455,14 +407,11 @@ print_hex(CTR,16);
 	{
 		CTR[15] += numBlocks-2;
 	}
-cout << "CTR          ";
-print_hex(CTR,16);
 
 	// copy the data
 	memcpy(temp, inputPtr, 32);
 	temp[32] = 0;
 	inputPtr -= 32;
-cout << "cypher block " << temp << endl;
 	// cast it to a hex value
 	for(j=15; j>=0; j--)
 	{
@@ -475,8 +424,6 @@ cout << "cypher block " << temp << endl;
 	{
 		// decrypt the data
 		AES_decrypt(inputBlock, outputBlock, &AESKey);
-cout << "post xor     ";
-print_hex(outputBlock, 16);
 		// now we can XOR it with the CTR
 		for(j=0; j<16; j++)
 		{
@@ -493,8 +440,6 @@ print_hex(outputBlock, 16);
 				break;
 			}
 		}
-cout << "CTR          ";
-print_hex(CTR,16);
 		// if this is the padded block
 		if(i == numBlocks-1)
 		{
@@ -531,7 +476,6 @@ print_hex(CTR,16);
 		// and copy the next block of data
 		memcpy(temp, inputPtr, 32);
 		inputPtr -= 32;
-cout << "cypher block " << temp << endl;
 		// and convert it to its hex value
 		for(j=15; j>=0; j--)
 		{
@@ -540,8 +484,5 @@ cout << "cypher block " << temp << endl;
 		}
 	}
 
-//	print_hex(inputBlock2,16);
-//	printf("%s\n",inputBlock2);
-	
 	return output;
 }
