@@ -39,6 +39,73 @@ These two commands would encrypt `-e` the message `files/message.txt` using CBC 
 ------
 
 MAC can be ran with
+    
+    bin/mac key_file message_file tag_file
+    
+you should get "success" messages and conversion of your hex strings to text , and promt questions loking like:
+
+    Read key...Success
+    Read message...Success
+    Converted key: "Where there's love there is life"
+    Converted message: "I believe that if life gives you lemons, you should make lemonade... And try to find somebody whose life has given  them vodka, and have a party."
+    Select CBC-MAC or Hash-and-MAC
+    Type 1 for CBC-MAC or 2 for Hash-and-MAC : 1
+    Type 1 Tag Generation or type 2 for for Verification : 1
+    
+The output will be saved to tag if Generation is chosen. There will be a stdout with tag generation block by block:
+    
+    Block  0 in: 900000000c0c0c0c0c0c0c0c0c0c0c0c
+    Block  0 out: d57339638a7a2805ca5c1393cb835ebc
+
+    Block   1 in: d57339638a7a2805ca5c1393cb835ebc
+    Message 1 in: 492062656c6965766520746861742069
+    M XOR B 1 in: 9c535b06e6134d73af7c67fbaaf77ed5
+    Block  1 out: 80497f876fb23e6888dd9ec1d5f7cc09
+
+    Block   2 in: 80497f876fb23e6888dd9ec1d5f7cc09
+    Message 2 in: 66206c69666520676976657320796f75
+    M XOR B 2 in: e66913ee09d71e0fe1abfbb2f58ea37c
+    Block  2 out: 9e9621d622ac5ba4d79d310ba8fd5ff0
+
+    Block   3 in: 9e9621d622ac5ba4d79d310ba8fd5ff0
+    Message 3 in: 206c656d6f6e732c20796f752073686f
+    M XOR B 3 in: befa44bb4dc22888f7e45e7e888e379f
+    Block  3 out: e29c6d0283f60999fe612f1978c37751
+
+    Block   4 in: e29c6d0283f60999fe612f1978c37751
+    Message 4 in: 756c64206d616b65206c656d6f6e6164
+    M XOR B 4 in: 97f00922ee9762fcde0d4a7417ad1635
+    Block  4 out: d5b111ec2d40de02408af62b7fcdba3c
+
+    Block   5 in: d5b111ec2d40de02408af62b7fcdba3c
+    Message 5 in: 652e2e2e20416e642074727920746f20
+    M XOR B 5 in: b09f3fc20d01b06660fe84525fb9d51c
+    Block  5 out: 7e51add5d4d6c5f5ff4bb7958162d090
+
+    Block   6 in: 7e51add5d4d6c5f5ff4bb7958162d090
+    Message 6 in: 66696e6420736f6d65626f6479207768
+    M XOR B 6 in: 1838c3b1f4a5aa989a29d8f1f842a7f8
+    Block  6 out: 9e122f5132498a139dfb9387098515d7
+
+    Block   7 in: 9e122f5132498a139dfb9387098515d7
+    Message 7 in: 6f7365206c6966652068617320676976
+    M XOR B 7 in: f1614a715e20ec76bd93f2f429e27ca1
+    Block  7 out: 4f83cbb1ed616648cb823388784d87d7
+
+    Block   8 in: 4f83cbb1ed616648cb823388784d87d7
+    Message 8 in: 656e207468656d20766f646b612c2061
+    M XOR B 8 in: 2aedebc585040b68bded57e31961a7b6
+    Block  8 out: cf1707d23402b71d19636ee14b44a8f3
+
+    Block   9 in: cf1707d23402b71d19636ee14b44a8f3
+    Message 9 in: 6e64206861766520612070617274792e
+    M XOR B 9 in: a17327ba5574d23d78431e803930d1dd
+    Block  9 out: 24316036ee15ea6546c8f93695bfbf76
+
+    Block   10 in: 24316036ee15ea6546c8f93695bfbf76
+    Message 10 in: 10101010101010101010101010101010
+    Block  10 out: dbdc71b494c4438214a5a39716d59acc
+    Tag:     dbdc71b494c4438214a5a39716d59acc
 
 -----
 
