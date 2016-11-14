@@ -38,7 +38,7 @@ These two commands would encrypt `-e` the message `files/message.txt` using CBC 
 
 ------
 
-MAC can be ran with
+MAC can be run with
     
     bin/mac [key_file] [message_file] [tag_file]
     
