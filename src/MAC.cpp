@@ -241,7 +241,7 @@ int main(int argc, char** argv){
 
 	/****   open Tag file to write to OR to read from   ****/
 
-	T_file.open(argv[3]);
+	T_file.open(argv[3], fstream::out | fstream::trunc);
 	if (T_file.fail()){
 		fprintf(stderr, "Couln't open file for tag -- %s\n", argv[3]);
 		exit(1);
@@ -266,10 +266,6 @@ int main(int argc, char** argv){
 			HashMacGen(Key,Message,MES_SIZE,Tag);
 		}
 
-		for (i = 0; i < 16; i++){
-			sprintf( temp, "%02x", (unsigned char)(unsigned int)IV[i] );
-			T_file << temp;
-		}
 		printf("Tag:     "); 
 		for (i = 0; i < 16; i++){
 			printf("%02x",(unsigned char)(unsigned int)Tag[i]);
@@ -286,13 +282,13 @@ int main(int argc, char** argv){
 		T_file >> t;
 		printf("Read tag: %s\n", t.c_str());
 
-		if (t.size() != 64){
+		if (t.size() != 32){
 			cout <<"***Tag is NOT valid***"<<endl;
 			return 0;
 		}
 
 		for (i = 0; i < 16; i++){
-			temp = t.substr(i*2+32,2);
+			temp = t.substr(i*2,2);
 			Tag += strtol(temp.c_str(),NULL,16);
 		}
 
