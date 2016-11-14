@@ -40,7 +40,7 @@ These two commands would encrypt `-e` the message `files/message.txt` using CBC 
 
 MAC can be ran with
     
-    bin/mac key_file message_file tag_file
+    bin/mac [key_file] [message_file] [tag_file]
     
 you should get "success" messages and conversion of your hex strings to text , and promt questions loking like:
 
