@@ -7,7 +7,7 @@ FLAGS = -lssl -lcrypto -I$(INC)
 DIR = /usr/local/opt/openssl
 MAC = -std=c++11 -lcrypto -lssl
 
-all: $(BIN)/rsa $(BIN)/aes $(BIN)/mac
+all: $(BIN)/rsa $(BIN)/aes $(BIN)/mac $(BIN)/sig
 
 clean:
 	rm -f $(OBJ)/* $(BIN)/*
@@ -17,6 +17,9 @@ $(BIN)/rsa: $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o
 
 $(BIN)/aes: $(OBJ)/aesDriver.o $(OBJ)/aes.o
 	$(CC) -o $(BIN)/aes $(OBJ)/aesDriver.o $(OBJ)/aes.o $(FLAGS)
+
+$(BIN)/sig: $(OBJ)/sigDriver.o $(OBJ)/sig.o
+	$(CC) -o $(BIN)/sig $(OBJ)/sigDriver.o $(OBJ)/sig.o $(FLAGS)
 
 $(OBJ)/rsaDriver.o: $(SRC)/rsaDriver.cpp
 	$(CC) -c -o $(OBJ)/rsaDriver.o $(SRC)/rsaDriver.cpp $(FLAGS)
@@ -32,6 +35,12 @@ $(OBJ)/aesDriver.o: $(SRC)/aesDriver.cpp
 
 $(OBJ)/aes.o: $(SRC)/aes.cpp $(INC)/aes.h
 	$(CC) -c -o $(OBJ)/aes.o $(SRC)/aes.cpp $(FLAGS)
+
+$(OBJ)/sigDriver.o: $(SRC)/sigDriver.cpp
+	$(CC) -c -o $(OBJ)/sigDriver.o $(SRC)/sigDriver.cpp $(FLAGS)
+
+$(OBJ)/sig.o: $(SRC)/sig.cpp $(INC)/sig.h
+	$(CC) -c -o $(OBJ)/sig.o $(SRC)/sig.cpp $(FLAGS)
 
 $(BIN)/mac: $(SRC)/MAC.cpp
 	$(CC) -o $(BIN)/mac $(SRC)/MAC.cpp $(MAC)

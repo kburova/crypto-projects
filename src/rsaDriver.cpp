@@ -8,8 +8,11 @@ int main(int argc, char** argv){
 
 	int task;
 	RSA_obj rsa;
-	string PK_file, SK_file, text_file, cipher_file;
-	fstream PK, SK, Text, Cipher;
+	string PK_file, SK_file, text_file, cypher_file;
+   string message;
+   string cypher;
+   ifstream PK, SK, in;
+   ofstream out;
 	cout << "Choose a task: \n"
 		<< "1  -  Key Generation\n"
 		<< "2  -  RSA Encryption\n"
@@ -30,23 +33,44 @@ int main(int argc, char** argv){
 			cin >> PK_file;
 			cout << "Enter path to Plain Text File" <<endl;
 			cin >> text_file;
-			cout << "Enter path to Cipher Text File" <<endl;
-			cin >> cipher_file;
+			cout << "Enter path to Cypher Text File" <<endl;
+			cin >> cypher_file;
 			cout<<endl;
-			rsa.RSAEncrypt(PK_file, text_file, cipher_file);
+         in.open(text_file.c_str(), in.in);
+         if(in.fail())
+         {
+            cout << "Error: file does not exist." << endl;
+            exit(0);
+         }
+         in >> message;
+
+			rsa.RSAEncrypt(PK_file, message, cypher);
+         out.open(cypher_file.c_str(), out.out);
+         out << cypher;
+         out.close();
 			break;
 		case 3:
 			cout << "Enter path to Secret Key File" <<endl;
 			cin >> SK_file;
+			cout << "Enter path to Cypher Text File" <<endl;
+			cin >> cypher_file;
 			cout << "Enter path to Plain Text File" <<endl;
 			cin >> text_file;
-			cout << "Enter path to Cipher Text File" <<endl;
-			cin >> cipher_file;
 			cout<<endl;
-			rsa.RSADecrypt(SK_file, cipher_file, text_file);
+         in.open(cypher_file.c_str(), in.in);
+         if(in.fail())
+         {
+            cout << "Error: file does not exist." << endl;
+            exit(0);
+         }
+         in >> cypher;
+
+			rsa.RSADecrypt(SK_file, cypher, message);
+         out.open(text_file.c_str(), out.out);
+         out << message;
+         out.close();
 		break;
 	}
-
 
 	return 0;
 }

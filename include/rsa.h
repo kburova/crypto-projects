@@ -16,8 +16,8 @@ private:
 public:	
 // functions
 	RSA_obj();
-	void RSAEncrypt(string, string, string);
-	void RSADecrypt(string, string, string);
+	void RSAEncrypt(string, string, string&);
+	void RSADecrypt(string, string, string&);
 	void openKeyFile(string&);
 };
 

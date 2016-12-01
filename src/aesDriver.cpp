@@ -177,8 +177,8 @@ Returns:
 
 void print_usage()
 {
-	cout << "\nUseage: aes_driver.exe [MODE] [OPTION] [KEY_FILE] [IMPUT_FILE] [OUTPUT_FILE]\n";
-	cout << "Use \"aes_driver.exe --help\" for list of cmd arguments\n\n";
+	cout << "\nUseage: aesDriver [MODE] [OPTION] [KEY_FILE] [IMPUT_FILE] [OUTPUT_FILE]\n";
+	cout << "Use \"aesDriver --help\" for list of cmd arguments\n\n";
 	return;
 }
 
@@ -192,7 +192,7 @@ Returns:
 
 void print_help()
 {
-	cout << "\nUseage: aes_driver.exe [MODE] [OPTION] [KEY_FILE] [IMPUT_FILE] [OUTPUT_FILE]\n\n";
+	cout << "\nUseage: aesDriver [MODE] [OPTION] [KEY_FILE] [IMPUT_FILE] [OUTPUT_FILE]\n\n";
 	cout << "MODES:\n";
 	cout << "\t-cbc\t\tEncrypt or decrypt using CBC mode\n";
 	cout << "\t-ctr\t\tEncrypt or decrypt using CTR mode\n";
@@ -200,5 +200,5 @@ void print_help()
 	cout << "\t-e\t\tEncrypt a message\n";
 	cout << "\t-d\t\tDecrypt a cypher\n\n";
 	cout << "\t--help\t\tDisplay help menu\n\n";
-	cout << "Example: aes_driver.exe -cbc -e key.txt message.txt out.txt\n\n";
+	cout << "Example: aesDriver -cbc -e key.txt message.txt out.txt\n\n";
 }

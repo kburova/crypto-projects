@@ -17,7 +17,7 @@ RSA_obj::RSA_obj()
 	BN_zero(&key);
 }
 
-void RSA_obj::RSAEncrypt(string keyFile, string messageFile, string cypherFile)
+void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 {
 	int i, j;									// loop iterattor
 	int padSize;								// pad Size
@@ -36,9 +36,6 @@ void RSA_obj::RSAEncrypt(string keyFile, string messageFile, string cypherFile)
 	unsigned char* mCon;						// message converter
 	unsigned char* mConPtr;					// pointer inside of mCon
 	unsigned char* randomness;				// randomness for the cypher
-	string temp;								// extracts the message from the file
-	ifstream in;								// stream to the message file
-	ofstream out;								// stream to the cypher file
 	BIGNUM m;									// message block in BIGNUM form;
 	BIGNUM c;									// cypher block in BIGNUM form;
 	BN_CTX* ctx;								// not realy sure what this is for;
@@ -56,24 +53,15 @@ void RSA_obj::RSAEncrypt(string keyFile, string messageFile, string cypherFile)
 	cypherSize = strlen(cCatch);
 	OPENSSL_free(cCatch);
 
-	// retreave the message
-	in.open(messageFile.c_str(), in.in);
-	if(in.fail())
-	{
-		cout << "Error: file does not exist." << endl;
-		exit(0);
-	}
-	in >> temp;
-
 	// determine the size of everything
-	mSize = temp.size()/2;
+	mSize = message.size()/2;
 	mBlockSize = (n/16) - 3;
 	numBlocks = (mSize/mBlockSize)+1;
 	lBlockSize = (mSize-((mSize/mBlockSize)*mBlockSize))*2;
 	padSize = mBlockSize-(mSize-((mSize/mBlockSize)*mBlockSize));
 
 	// allocate all the dynamic memory
-	mCpy = (char*)malloc(temp.size()+1);
+	mCpy = (char*)malloc(message.size()+1);
 	mBlock = (char*)malloc(mBlockSize*2 +1);
 	mCon = (unsigned char*)malloc((n/8)+1);
 	cypher = (char*)malloc((cypherSize*numBlocks)+1);
@@ -84,7 +72,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string messageFile, string cypherFile)
 	cPtr = cypher;
 	mConPtr = mCon;
 
-	strcpy(mCpy,temp.c_str());
+	strcpy(mCpy,message.c_str());
 
 	// copy the message blocks, get some randomness, and build the string that
 	// gets converted to a BIGNUM.  Do the math on it and convert it back to a
@@ -188,11 +176,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string messageFile, string cypherFile)
 	}
 	OPENSSL_free(cCatch);
 
-	out.open(cypherFile.c_str(), out.out);
-	out << cypher;
-	out.close();
-
-
+	output = cypher;
 
 	free(mCon);
 	free(randomness);
@@ -205,7 +189,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string messageFile, string cypherFile)
 	return;
 }
 
-void RSA_obj::RSADecrypt(string keyFile, string cypherFile, string messageFile)
+void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 {
 	int i, j;									// loop iterattor
 	int cypherSize;							// size of the cypher string
@@ -222,12 +206,10 @@ void RSA_obj::RSADecrypt(string keyFile, string cypherFile, string messageFile)
 	unsigned long mBlockSize;				// message block size
 	unsigned long numBlocks;				// number of block the cypher will contain
 	unsigned char* cCon;						// cypher converter
-	string temp;								// extracts the message from the file
-	ifstream in;								// stream to the message file
-	ofstream out;								// stream to the cypher file
 	BIGNUM m;									// message block in BIGNUM form;
 	BIGNUM c;									// cypher block in BIGNUM form;
 	BN_CTX* ctx;								// not realy sure what this is for;
+
 
 	// initalize BIGNUM objs
 	BN_init(&m);
@@ -242,18 +224,8 @@ void RSA_obj::RSADecrypt(string keyFile, string cypherFile, string messageFile)
 	cypherBlockSize = strlen(cCatch);
 	OPENSSL_free(cCatch);
 	
-
-	// retreave the message
-	in.open(cypherFile.c_str(), in.in);
-	if(in.fail())
-	{
-		cout << "Error: file does not exist." << endl;
-		exit(0);
-	}
-	in >> temp;
-
 	// determine the sizes that we need
-	cypherSize = temp.size();
+	cypherSize = input.size();
 	numBlocks = cypherSize/cypherBlockSize;
 	mBlockSize = (n/16) - 3; 
 
@@ -265,8 +237,9 @@ void RSA_obj::RSADecrypt(string keyFile, string cypherFile, string messageFile)
 	message = (char*)malloc(mBlockSize*2*numBlocks);
 	
 
-	memcpy(cypher, temp.c_str(), cypherSize);
+	memcpy(cypher, input.c_str(), cypherSize);
 	cypher[cypherSize] = 0;
+
 
 	// asign pointers
 	cPtr = cypher;
@@ -329,9 +302,7 @@ void RSA_obj::RSADecrypt(string keyFile, string cypherFile, string messageFile)
 
 	OPENSSL_free(cCatch);
 
-	out.open(messageFile.c_str(), out.out);
-	out << message;
-	out.close();
+	output = message;
 
 	free(mCpy);
 	free(message);
