@@ -1,15 +1,11 @@
 #include <iostream>
-#include <cstdlib>
-#include <cstdio>
-
 #include <openssl/bn.h>
 #include "rsa.h"
 
 using namespace std;
 
-int passFermatTest(BIGNUM *prime);
 
-void keyGen(string & PK_file, string &SK_file) {
+void keyGen(const string & PK_file,const string & SK_file,const string & identity, const string & CAsig ) {
     bool notFound = true;
     unsigned long int fermatPrime = 65537;
     FILE *PK, *SK;
@@ -43,6 +39,7 @@ void keyGen(string & PK_file, string &SK_file) {
         exit(1);
     }
 
+
     cout << "Enter security parameter n: " << endl;
     cin >> secParam;
 
@@ -60,7 +57,7 @@ void keyGen(string & PK_file, string &SK_file) {
             c = (char *) malloc(sizeof(char) * 300);
             for (i = 0; i < 300; i++) c[i] = '\0';
             c = BN_bn2dec(p);
-            printf("p: %s\n\n", c);
+           // printf("p: %s\n\n", c);
             free(c);
         }
     }
@@ -82,7 +79,7 @@ void keyGen(string & PK_file, string &SK_file) {
             c = (char *) malloc(sizeof(char) * 300);
             for (i = 0; i < 300; i++) c[i] = '\0';
             c = BN_bn2dec(q);
-            printf("q: %s\n\n", c);
+           // printf("q: %s\n\n", c);
             free(c);
         }
     }
@@ -116,34 +113,47 @@ void keyGen(string & PK_file, string &SK_file) {
     c = (char*)malloc(sizeof(char)*300);
     for (i= 0; i<300;i++) c[i] = '\0';
     c = BN_bn2dec(e);
-    printf ("e: %s\n", c);
+   // printf ("e: %s\n", c);
     free(c);
 
     c = (char*)malloc(sizeof(char)*300);
     for (i= 0; i<300;i++) c[i] = '\0';
     c = BN_bn2dec(orderOfGroup);
-    printf ("order of the Group: %s\n", c);
+   // printf ("order of the Group: %s\n", c);
     free(c);
 
     c = (char*)malloc(sizeof(char)*300);
     for (i= 0; i<300;i++) c[i] = '\0';
     c = BN_bn2dec(d);
-    printf ("d: %s\n", c);
+   // printf ("d: %s\n", c);
     free(c);
 
     printf("Writing Public Key to a file...\n");
+    fprintf(PK, "Identity:\n%s\n\n", identity.c_str());
+    fprintf(PK, "--- BEGIN PUBLIC KEY ---\n");
+    fprintf(PK, "N:\n");
     BN_print_fp(PK, N);
     fprintf(PK, "\n");
+    fprintf(PK, "Bits:\n");
+    fprintf(PK, "%lx\n", secParam);
+    fprintf(PK, "Key:\n");
     BN_print_fp(PK, e);
+    fprintf(PK, "\n");
+    fprintf(PK, "---- END PUBLIC KEY ----\n");
 
-    fprintf(PK, "\n%lx", secParam);
 
     printf("Writing Secret Key to a file...\n");
 
+    fprintf(SK, "--- BEGIN SECRET KEY ---\n");
+    fprintf(SK, "N:\n");
     BN_print_fp(SK, N);
     fprintf(SK, "\n");
-    BN_print_fp(SK, d);
-    fprintf(SK, "\n%lx", secParam);
+    fprintf(SK, "Bits:\n");
+    fprintf(SK, "%lx\n", secParam);
+    fprintf(SK, "Key:\n");
+    BN_print_fp(SK, N);
+    fprintf(SK, "\n");
+    fprintf(SK, "---- END SECRET KEY ----\n");
 
     fclose(PK);
     fclose(SK);

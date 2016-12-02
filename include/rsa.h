@@ -13,15 +13,18 @@ private:
 	unsigned long n;						// Secutity parameter in bits
 	BIGNUM N;								//
 	BIGNUM key;
+	string identity;
 public:	
 // functions
 	RSA_obj();
 	void RSAEncrypt(string, string, string&);
 	void RSADecrypt(string, string, string&);
-	void openKeyFile(string&);
+	void openPublicKeyFile(string&);
+	void openSecretKeyFile(string&);
 };
 
-void keyGen(string&, string&);
-
+void keyGen(const string & PK_file,const string & SK_file,const string & identity, const string & CAsig = "");
+int passFermatTest(BIGNUM *prime);
+int signCertificate(const string & PK_file, const string & CAsig);
 
 #endif

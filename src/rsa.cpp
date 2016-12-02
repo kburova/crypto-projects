@@ -46,7 +46,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 	ctx = BN_CTX_new();
 
 	// retreave all the key information and store them in the class
-	openKeyFile(keyFile);
+	openPublicKeyFile(keyFile);
 
 	// determine size of the cypher block string;
 	cCatch = BN_bn2hex(&N);
@@ -217,7 +217,7 @@ void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 	ctx = BN_CTX_new();
 
 	// retreave all the key information and store them in the class
-	openKeyFile(keyFile);
+	openSecretKeyFile(keyFile);
 
 	// determine size of the cypher block string;
 	cCatch = BN_bn2hex(&N);
@@ -315,7 +315,7 @@ void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 	return;
 }
 
-void RSA_obj::openKeyFile(string& fileName)
+void RSA_obj::openPublicKeyFile(string& fileName)
 {
 	int i;							// loop itterator
 	int size;						// size of the conversion string
@@ -330,58 +330,139 @@ void RSA_obj::openKeyFile(string& fileName)
 		cout << "Error: File does not exist" << endl;
 		exit(0);
 	}
-	
-	in >> temp;
-	convert1 = (unsigned char*)malloc(temp.size()/2);
-	convert2 = (char*)malloc(temp.size()+1);
-	strcpy(convert2, temp.c_str());
-	if(temp.size()%2)
-	{
-		size = (temp.size()+1)/2;
-		for(i = size-1; i > 0; i--)
-		{   
-			convert1[i] = (unsigned char) strtol(convert2+(i*2-1), NULL, 16);
-			convert2[i*2-1] = 0;
-		}   
-		convert1[0] = (unsigned char) strtol(convert2, NULL, 16);
-	}
-	else
-	{
-		size = temp.size()/2;
-		for(i = size-1; i >= 0; i--)
-		{   
-			convert1[i] = (unsigned char) strtol(convert2+(i*2),NULL,16);
-			convert2[i*2] = 0;
-		}   
-	}
-	BN_bin2bn(convert1, size, &N);
 
-	in >> temp;
-	strcpy(convert2, temp.c_str());
-	if(temp.size()%2)
-	{
-		size = (temp.size()+1)/2;
-		for(i = size-1; i > 0; i--)
-		{   
-			convert1[i] = (unsigned char) strtol(convert2+(i*2-1), NULL, 16);
-			convert2[i*2-1] = 0;
-		}   
-		convert1[0] = (unsigned char) strtol(convert2, NULL, 16);
-	}
-	else
-	{
-		size = temp.size()/2;
-		for(i = size-1; i >= 0; i--)
-		{   
-			convert1[i] = (unsigned char) strtol(convert2+(i*2),NULL,16);
-			convert2[i*2] = 0;
-		}   
-	}
-	BN_bin2bn(convert1, size, &key);
 
-	in >> temp;
-	n = strtol(temp.c_str(), NULL, 16);
 
+	while (getline(in, temp)) {
+
+		/*** get N ***/
+		if (temp == "N:") {
+
+			getline(in,temp);
+			convert1 = (unsigned char *) malloc(temp.size() / 2);
+			convert2 = (char *) malloc(temp.size() + 1);
+			strcpy(convert2, temp.c_str());
+			if (temp.size() % 2) {
+				size = (temp.size() + 1) / 2;
+				for (i = size - 1; i > 0; i--) {
+					convert1[i] = (unsigned char) strtol(convert2 + (i * 2 - 1), NULL, 16);
+					convert2[i * 2 - 1] = 0;
+				}
+				convert1[0] = (unsigned char) strtol(convert2, NULL, 16);
+			} else {
+				size = temp.size() / 2;
+				for (i = size - 1; i >= 0; i--) {
+					convert1[i] = (unsigned char) strtol(convert2 + (i * 2), NULL, 16);
+					convert2[i * 2] = 0;
+				}
+			}
+			BN_bin2bn(convert1, size, &N);
+
+		}else if (temp == "Key:") {
+			/*** get Key ***/
+			getline(in,temp);
+			strcpy(convert2, temp.c_str());
+			if (temp.size() % 2) {
+				size = (temp.size() + 1) / 2;
+				for (i = size - 1; i > 0; i--) {
+					convert1[i] = (unsigned char) strtol(convert2 + (i * 2 - 1), NULL, 16);
+					convert2[i * 2 - 1] = 0;
+				}
+				convert1[0] = (unsigned char) strtol(convert2, NULL, 16);
+			} else {
+				size = temp.size() / 2;
+				for (i = size - 1; i >= 0; i--) {
+					convert1[i] = (unsigned char) strtol(convert2 + (i * 2), NULL, 16);
+					convert2[i * 2] = 0;
+				}
+			}
+			BN_bin2bn(convert1, size, &key);
+
+		}else if (temp == "Bits:") {
+			/*** get n: ***/
+			getline(in,temp);
+			cout <<"n:  "<< temp << endl;
+			n = strtol(temp.c_str(), NULL, 16);
+
+		}else if (temp == "Identity:"){
+
+			/*** read an identity ***/
+			getline(in,temp);
+			identity = temp;
+		}
+	}
+	free(convert1);
+	free(convert2);
+
+	return;
+}
+
+void RSA_obj::openSecretKeyFile(string& fileName)
+{
+	int i;							// loop itterator
+	int size;						// size of the conversion string
+	ifstream in;					// file stream
+	string temp;					// extracts data from file
+	unsigned char *convert1;	// used to convert string to hex
+	char *convert2;				// used to convert string to hex
+
+	in.open(fileName.c_str(), in.in);
+	if(in.fail())
+	{
+		cout << "Error: File does not exist" << endl;
+		exit(0);
+	}
+
+	while ( getline(in,temp) ) {
+
+		if (temp == "N:") {
+
+
+			getline(in,temp);
+			convert1 = (unsigned char *) malloc(temp.size() / 2);
+			convert2 = (char *) malloc(temp.size() + 1);
+			strcpy(convert2, temp.c_str());
+			if (temp.size() % 2) {
+				size = (temp.size() + 1) / 2;
+				for (i = size - 1; i > 0; i--) {
+					convert1[i] = (unsigned char) strtol(convert2 + (i * 2 - 1), NULL, 16);
+					convert2[i * 2 - 1] = 0;
+				}
+				convert1[0] = (unsigned char) strtol(convert2, NULL, 16);
+			} else {
+				size = temp.size() / 2;
+				for (i = size - 1; i >= 0; i--) {
+					convert1[i] = (unsigned char) strtol(convert2 + (i * 2), NULL, 16);
+					convert2[i * 2] = 0;
+				}
+			}
+			BN_bin2bn(convert1, size, &N);
+
+		}else if (temp == "Key:") {
+
+			getline(in,temp);
+			strcpy(convert2, temp.c_str());
+			if (temp.size() % 2) {
+				size = (temp.size() + 1) / 2;
+				for (i = size - 1; i > 0; i--) {
+					convert1[i] = (unsigned char) strtol(convert2 + (i * 2 - 1), NULL, 16);
+					convert2[i * 2 - 1] = 0;
+				}
+				convert1[0] = (unsigned char) strtol(convert2, NULL, 16);
+			} else {
+				size = temp.size() / 2;
+				for (i = size - 1; i >= 0; i--) {
+					convert1[i] = (unsigned char) strtol(convert2 + (i * 2), NULL, 16);
+					convert2[i * 2] = 0;
+				}
+			}
+			BN_bin2bn(convert1, size, &key);
+		}else if (temp == "Bits:") {
+
+			getline(in,temp);
+			n = strtol(temp.c_str(), NULL, 16);
+		}
+	}
 	free(convert1);
 	free(convert2);
 
