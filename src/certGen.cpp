@@ -13,7 +13,7 @@ int signCertificate(const string & PK_file, const string & CAsig){
 
     CA = fopen(PK_file.c_str(), "r");
     if (CA == NULL) {
-        fprintf(stderr, "Couldn't open Private Key file to sign %s\n", PK_file.c_str());
+        fprintf(stderr, "Couldn't open file that holds Secret Key for signing %s\n", PK_file.c_str());
         exit(1);
     }
 
