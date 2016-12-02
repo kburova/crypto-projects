@@ -1,9 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
-/******************* NEW **********************/
-#include <cstring>
-/******************* NEW **********************/
+
 #include <openssl/bn.h>
 #include "rsa.h"
 
@@ -16,9 +14,7 @@ void keyGen(string & PK_file, string &SK_file) {
     unsigned long int fermatPrime = 65537;
     FILE *PK, *SK;
     char *c;
-/******************* NEW **********************/
-	char check[17];
-/******************* NEW **********************/
+
     unsigned long int secParam;
     int i, j;
     BIGNUM *p = BN_new();
@@ -139,20 +135,7 @@ void keyGen(string & PK_file, string &SK_file) {
     BN_print_fp(PK, N);
     fprintf(PK, "\n");
     BN_print_fp(PK, e);
-/******************* NEW **********************
-	sprintf(check, "%lx", secParam);
-	printf("lengtn is %d\n",(int)strlen(check));
-	printf("check is %s\n",check);
-	if(strlen(check)%2)
-	{
-		for(int z = strlen(check)+1; z > 0; z--)
-		{
-			check[z] = check[z-1];
-		}
-		check[0]='0';
-		printf("check is %s\n",check);
-	}
-/******************* NEW **********************/
+
     fprintf(PK, "\n%lx", secParam);
 
     printf("Writing Secret Key to a file...\n");
