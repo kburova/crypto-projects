@@ -18,8 +18,8 @@ $(BIN)/rsa: $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o
 $(BIN)/aes: $(OBJ)/aesDriver.o $(OBJ)/aes.o
 	$(CC) -o $(BIN)/aes $(OBJ)/aesDriver.o $(OBJ)/aes.o $(FLAGS)
 
-$(BIN)/sig: $(OBJ)/sigDriver.o $(OBJ)/sig.o
-	$(CC) -o $(BIN)/sig $(OBJ)/sigDriver.o $(OBJ)/sig.o $(FLAGS)
+$(BIN)/sig: $(OBJ)/sigDriver.o $(OBJ)/sig.o $(OBJ)/rsa.o
+	$(CC) -o $(BIN)/sig $(OBJ)/sigDriver.o $(OBJ)/sig.o $(OBJ)/rsa.o $(FLAGS)
 
 $(OBJ)/rsaDriver.o: $(SRC)/rsaDriver.cpp
 	$(CC) -c -o $(OBJ)/rsaDriver.o $(SRC)/rsaDriver.cpp $(FLAGS)
