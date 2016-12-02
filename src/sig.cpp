@@ -29,6 +29,7 @@ bool verify(string SK_file, string signature, string message)
    sig.RSADecrypt(SK_file, signature, newMessage);
 
    if(message == newMessage) return true;
+
    return false;
 }
 
