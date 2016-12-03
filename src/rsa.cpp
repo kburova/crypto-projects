@@ -51,6 +51,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 	// determine size of the cypher block string;
 	cCatch = BN_bn2hex(&N);
 	cypherSize = strlen(cCatch);
+cout << "cypherSize  " << cypherSize << endl;
 	OPENSSL_free(cCatch);
 
 	// determine the size of everything
@@ -75,6 +76,7 @@ cout << "padSize  " << padSize << endl;
 	// set string itterators
 	mPtr = mCpy;
 	cPtr = cypher;
+cout << "difference: " << cPtr - cypher << endl;
 	mConPtr = mCon;
 
 	strcpy(mCpy,message.c_str());
@@ -123,17 +125,22 @@ cout << endl;
 		// make sure all blocks are the same size
 		if(testSize)
 		{
+
+cout << "INSIDE TEST" << endl;
+
 			for(j=0;j<testSize;j++)
 			{
 				cPtr[j] = 0;
 			}
 			memcpy(cPtr+testSize, cCatch, cypherSize-testSize);
 			cPtr += cypherSize;
+cout << "difference: " << cPtr - cypher << endl;
 		}
 		else
 		{
 			memcpy(cPtr, cCatch, cypherSize);
 			cPtr += cypherSize;
+cout << "difference: " << cPtr - cypher << endl;
 		}
 		OPENSSL_free(cCatch);
 	}
@@ -183,15 +190,18 @@ cout << endl;
 		}
 		memcpy(cPtr+testSize, cCatch, cypherSize-testSize);
 		cPtr += cypherSize;
+cout << "difference: " << cPtr - cypher << endl;
 	}
 	else
 	{
 		memcpy(cPtr, cCatch, cypherSize);
 		cPtr += cypherSize;
+cout << "difference: " << cPtr - cypher << endl;
 	}
+   cPtr[0] = 0;
 	OPENSSL_free(cCatch);
-//	printf("Cipher: %s\n", cypher);
-//	fflush(stdout);
+	printf("Cipher: %s\nSize: %d\n", cypher, (int)strlen(cypher));
+	fflush(stdout);
 	output = cypher;
 
 	free(mCon);
@@ -239,6 +249,7 @@ cout << output << endl << output.size() << endl;
 	// determine size of the cypher block string;
 	cCatch = BN_bn2hex(&N);
 	cypherBlockSize = strlen(cCatch);
+cout << "cypherBlockSize  " << cypherBlockSize << endl;
 	OPENSSL_free(cCatch);
 	
 	// determine the sizes that we need
