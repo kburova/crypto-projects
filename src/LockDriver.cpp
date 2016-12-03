@@ -33,8 +33,8 @@ int main(int argc, char** argv){
 
     dirToLock dirObj(dir, PK, SK, SIG, userPK, userSIG);
     dirObj.verifyPKeys();
-
-
+    dirObj.generateAESKeys();
+    dirObj.encryptFiles();
 
     return 0;
 }

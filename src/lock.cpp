@@ -1,8 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
 #include "lock.h"
 #include "sig.h"
+#include "aes.h"
 
 
 dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS){
@@ -38,22 +40,94 @@ dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, 
     }
 
     // START OPENING ALL FILES AND STORE KEYS INFORMATION INTO CLASS
+        //locker
     readKeyFile(PK, lockerPK);
     readKeyFile(SK, lockerSK);
     readSigFile(S, lockerSig);
-
+        //requester
     readKeyFile(uPK, personPK);
     readSigFile(uS, personSig);
 }
 
 void dirToLock::generateAESKeys() {
 
-    string fileForKeys = dirName + "/SharedKeys";
-    BIGNUM *encKey = BN_new();
-    BIGNUM *macKey = BN_new();
+    //create new file for storing keys
+    FILE * SharedKeys;
+    fileForKeys = dirName + "/SharedKeys";
+
+    SharedKeys = fopen(fileForKeys.c_str(), "w");
+    if (SharedKeys == NULL){
+        fprintf(stderr, "Failed to open file to write - %s\n", fileForKeys.c_str());
+        exit(1);
+    }
+
+    encKey = BN_new();
+    macKey = BN_new();
 
     BN_rand(encKey, 256, 0, 1);
     BN_rand(macKey, 256, 0, 1);
+
+    fprintf(SharedKeys, "---Encryption key---\n");
+    BN_print_fp(SharedKeys, encKey);
+    fprintf(SharedKeys, "\n");
+    fprintf(SharedKeys, "---Macing key---\n");
+    BN_print_fp(SharedKeys, macKey);
+
+    fclose(SharedKeys);
+}
+
+void dirToLock::encryptFiles(){
+
+
+    ifstream from;
+    ofstream to;
+    stringstream ss;
+    string inp;
+    string temp;
+    char *key;
+    char *output;
+    char *input;
+
+    for (string file : dirFiles) {
+
+
+        from.open(file.c_str());
+        if (from.fail()) {
+            perror("Error: Could open file to encrypt");
+            exit(1);
+        }
+        temp = file + ".enc";
+        to.open(temp.c_str());
+        if (to.fail()) {
+            perror("Error: Could open file to write encrypt");
+            exit(1);
+        }
+
+        ss.clear();
+        ss << from.rdbuf();
+        inp = ss.str();
+        input = (char*) malloc(sizeof(char) * inp.size() + 1);
+        memcpy(input, inp.c_str(), inp.size());
+        input[inp.size()] = '\0';
+        printf ("%s\n", input);
+        AES aes;
+
+        key = BN_bn2hex(encKey);
+
+        printf ("%s\n", key);
+        aes.setKey(256, key);
+
+
+        output = aes.CBCencrypt(inp.length(), input);
+        printf ("%s\n", output);
+
+        to << output;
+
+        to.close();
+        from.close();
+        free(input);
+    }
+
 }
 void dirToLock::dirToStr(string &d, string &m){
 
@@ -95,6 +169,7 @@ void dirToLock::verifyPKeys(){
         cout << "Both party verified successfully..." <<endl;
     }
 }
+
 void dirToLock::lock(){
 
 }

@@ -26,6 +26,7 @@ protected:
 
     DIR *dir;
     string dirName;
+    string fileForKeys;
     struct dirent *de;
     vector <string> dirFiles;
 
@@ -41,6 +42,9 @@ protected:
     key lockerSK;
     string lockerSig;
 
+    BIGNUM *encKey;
+    BIGNUM *macKey;
+
 public:
 
     dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS);
@@ -49,6 +53,7 @@ public:
     void dirToStr(string &d, string & m);
     void verifyPKeys();
     void generateAESKeys();
+    void encryptFiles();
 
     void lock();
 
