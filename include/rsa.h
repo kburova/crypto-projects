@@ -25,6 +25,6 @@ public:
 
 void keyGen(const string & PK_file,const string & SK_file,const string & identity, const string & CAsig = "");
 int passFermatTest(BIGNUM *prime);
-int signCertificate(const string & PK_file, const string & CAsig);
+void signCertificate(const string & PK_file, const string & CAsig);
 
 #endif

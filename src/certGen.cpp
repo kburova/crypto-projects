@@ -1,20 +1,42 @@
 #include <iostream>
 #include <openssl/bn.h>
+#include <fstream>
+#include <sstream>
 #include "rsa.h"
 #include "sig.h"
 
 using namespace std;
 
-int signCertificate(const string & PK_file, const string & CAsig){
+void signCertificate(const string & PK_file, const string & CAsig){
 
-    FILE *CA;
+    ifstream PK;
+    ofstream SF;
+    stringstream ss;
+    string messageToSig;
+    string sigFile = "/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/files/sig.txt";
+    string signature = "";
 
-    /*** open file that has signature to sign things ***/
-
-    CA = fopen(PK_file.c_str(), "r");
-    if (CA == NULL) {
-        fprintf(stderr, "Couldn't open file that holds Secret Key for signing %s\n", PK_file.c_str());
+    PK.open(PK_file);
+    if (PK.fail()){
+        perror("Error: Could open certificate");
         exit(1);
     }
+    SF.open(sigFile);
+    if (SF.fail()){
+        perror("Error: Could open file for signature");
+        exit(1);
+    }
+
+    ss.clear();
+    ss << PK.rdbuf();
+    messageToSig = ss.str();
+
+    PK.close();
+
+    /*** call Signature function to sign public key file ***/
+    sig(CAsig, messageToSig, signature);
+    SF << signature;
+    cout <<"Sig: "<< signature <<endl;
+    SF.close();
 
 }

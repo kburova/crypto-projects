@@ -8,8 +8,8 @@ int main(int argc, char** argv){
 
 	int task;
 	RSA_obj rsa;
-	string PK_file, SK_file, text_file, cypher_file, CAsig = "/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/files/signature.txt";
-	string identity = "Ksenia";
+	string PK_file, SK_file, text_file, cypher_file;
+	string identity = "I_want_an_A";
     string message;
     string cypher;
     ifstream PK, SK, in;
@@ -27,7 +27,7 @@ int main(int argc, char** argv){
 			cout << "Enter path to Secret Key File" <<endl;
 			cin >> SK_file;
 			cout<<endl;
-			keyGen(PK_file, SK_file, identity, CAsig);
+			keyGen(PK_file, SK_file, identity);
 			break;
 		case 2:
 			cout << "Enter path to Public Key File" <<endl;
