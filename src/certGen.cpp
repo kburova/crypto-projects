@@ -13,8 +13,12 @@ void signCertificate(const string & PK_file, const string & CAsig){
     ofstream SF;
     stringstream ss;
     string messageToSig;
-    string sigFile = "/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/files/sig.txt";
+    string sigFile;
+            //= "/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/files/signature.txt";
     string signature = "";
+
+    cout << "Enter signature file: " <<endl;
+    cin >> sigFile;
 
     PK.open(PK_file);
     if (PK.fail()){
