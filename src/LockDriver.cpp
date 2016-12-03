@@ -8,10 +8,11 @@ int main(int argc, char** argv){
 
 
     string dir, PK, SK, SIG, userPK, userSIG;
+    ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/input");
+    cin.rdbuf(in.rdbuf());
 
     cout << "Enter path for directory to lock" << endl;
     cin >> dir;
-
     cout << "Enter path for locking party Public Key" << endl;
     cin >> PK;
     cout << "Enter path for locking party Secret Key" << endl;
@@ -24,8 +25,14 @@ int main(int argc, char** argv){
     cout << "Enter path for user's signature" << endl;
     cin >> userSIG;
 
-    dirToLock dirObj(dir, PK, SK, SIG, userPK, userSIG);
+//    cout << PK <<endl
+//         << SK <<endl
+//         << SIG << endl
+//         << userPK <<endl
+//         << userSIG <<endl;
 
+    dirToLock dirObj(dir, PK, SK, SIG, userPK, userSIG);
+    dirObj.verifyPKeys();
 
 
 
