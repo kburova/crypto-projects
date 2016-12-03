@@ -32,12 +32,16 @@ int main(int argc, char** argv){
 			keyGen(PK_file, SK_file, identity);
 			break;
 		case 2:
+PK_file = "files/SK";
+text_file = "files/message4.txt";
+cypher_file = "files/siggg.txt";
+
 			cout << "Enter path to Public Key File" <<endl;
-			cin >> PK_file;
+//			cin >> PK_file;
 			cout << "Enter path to Plain Text File" <<endl;
-			cin >> text_file;
+//			cin >> text_file;
 			cout << "Enter path to Cypher Text File" <<endl;
-			cin >> cypher_file;
+//			cin >> cypher_file;
 			cout<<endl;
 
          in.open(text_file.c_str(), in.in);
@@ -54,12 +58,15 @@ int main(int argc, char** argv){
          out.close();
 			break;
 		case 3:
+SK_file = "files/PK";
+text_file = "files/newMessage.txt";
+cypher_file = "files/siggg.txt";
 			cout << "Enter path to Secret Key File" <<endl;
-			cin >> SK_file;
+//			cin >> SK_file;
 			cout << "Enter path to Cypher Text File" <<endl;
-			cin >> cypher_file;
+//			cin >> cypher_file;
 			cout << "Enter path to Plain Text File" <<endl;
-			cin >> text_file;
+//			cin >> text_file;
 			cout<<endl;
          in.open(cypher_file.c_str(), in.in);
          if(in.fail())

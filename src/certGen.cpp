@@ -20,12 +20,12 @@ void signCertificate(const string & PK_file, const string & CAsig){
     cout << "Enter signature file: " <<endl;
     cin >> sigFile;
 
-    PK.open(PK_file);
+    PK.open(PK_file.c_str());
     if (PK.fail()){
         perror("Error: Could open certificate");
         exit(1);
     }
-    SF.open(sigFile);
+    SF.open(sigFile.c_str());
     if (SF.fail()){
         perror("Error: Could open file for signature");
         exit(1);
