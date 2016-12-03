@@ -175,7 +175,8 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 		cPtr += cypherSize;
 	}
 	OPENSSL_free(cCatch);
-
+	printf("Cipher: %s\n", cypher);
+	fflush(stdout);
 	output = cypher;
 
 	free(mCon);

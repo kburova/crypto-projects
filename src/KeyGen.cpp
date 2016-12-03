@@ -151,7 +151,7 @@ void keyGen(const string & PK_file,const string & SK_file,const string & identit
     fprintf(SK, "Bits:\n");
     fprintf(SK, "%lx\n", secParam);
     fprintf(SK, "Key:\n");
-    BN_print_fp(SK, N);
+    BN_print_fp(SK, d);
     fprintf(SK, "\n");
     fprintf(SK, "---- END SECRET KEY ----\n");
 

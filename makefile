@@ -3,7 +3,7 @@ BIN = bin
 INC = include
 OBJ = obj
 SRC = src
-FLAGS = -lssl -lcrypto -I$(INC)
+FLAGS = -lssl -lcrypto -I$(INC) -I/usr/local/opt/openssl/include
 DIR = /usr/local/opt/openssl
 MAC = -std=c++11 -lcrypto -lssl
 
@@ -12,8 +12,8 @@ all: $(BIN)/rsa $(BIN)/aes $(BIN)/mac $(BIN)/sig
 clean:
 	rm -f $(OBJ)/* $(BIN)/*
 
-$(BIN)/rsa: $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o
-	$(CC) -o $(BIN)/rsa $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(FLAGS)
+$(BIN)/rsa: $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(OBJ)/certGen.o $(OBJ)/sig.o
+	$(CC) -o $(BIN)/rsa $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(OBJ)/certGen.o $(OBJ)/sig.o $(FLAGS)
 
 $(BIN)/aes: $(OBJ)/aesDriver.o $(OBJ)/aes.o
 	$(CC) -o $(BIN)/aes $(OBJ)/aesDriver.o $(OBJ)/aes.o $(FLAGS)
@@ -41,6 +41,9 @@ $(OBJ)/sigDriver.o: $(SRC)/sigDriver.cpp
 
 $(OBJ)/sig.o: $(SRC)/sig.cpp $(INC)/sig.h
 	$(CC) -c -o $(OBJ)/sig.o $(SRC)/sig.cpp $(FLAGS)
+
+$(OBJ)/certGen.o: $(SRC)/certGen.cpp $(INC)/rsa.h
+	$(CC) -c -o $(OBJ)/certGen.o $(SRC)/certGen.cpp $(FLAGS)
 
 $(BIN)/mac: $(SRC)/MAC.cpp
 	$(CC) -o $(BIN)/mac $(SRC)/MAC.cpp $(MAC)
