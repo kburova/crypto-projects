@@ -9,7 +9,7 @@ int main(int argc, char** argv){
 	int task;
 	RSA_obj rsa;
 	string PK_file, SK_file, text_file, cypher_file;
-	string identity = "I_want_an_A";
+	string identity;
     string message;
     string cypher;
     ifstream PK, SK, in;
@@ -26,6 +26,8 @@ int main(int argc, char** argv){
 			cin >> PK_file;
 			cout << "Enter path to Secret Key File" <<endl;
 			cin >> SK_file;
+			cout << "Enter your identity" <<endl;
+			cin >> identity;
 			cout<<endl;
 			keyGen(PK_file, SK_file, identity);
 			break;
@@ -37,6 +39,7 @@ int main(int argc, char** argv){
 			cout << "Enter path to Cypher Text File" <<endl;
 			cin >> cypher_file;
 			cout<<endl;
+
          in.open(text_file.c_str(), in.in);
          if(in.fail())
          {
