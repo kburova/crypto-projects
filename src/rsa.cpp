@@ -381,7 +381,6 @@ void RSA_obj::openPublicKeyFile(string& fileName)
 		}else if (temp == "Bits:") {
 			/*** get n: ***/
 			getline(in,temp);
-			cout <<"n:  "<< temp << endl;
 			n = strtol(temp.c_str(), NULL, 16);
 
 		}else if (temp == "Identity:"){
@@ -391,8 +390,8 @@ void RSA_obj::openPublicKeyFile(string& fileName)
 			identity = temp;
 		}
 	}
-	free(convert1);
-	free(convert2);
+	//free(convert1);
+	//free(convert2);
 
 	return;
 }
@@ -463,8 +462,8 @@ void RSA_obj::openSecretKeyFile(string& fileName)
 			n = strtol(temp.c_str(), NULL, 16);
 		}
 	}
-	free(convert1);
-	free(convert2);
+	//free(convert1);
+	//free(convert2);
 
 	return;
 }

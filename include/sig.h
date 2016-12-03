@@ -9,6 +9,6 @@ using std::string;
 
 void sig(string, string, string&);
 bool verify(string, string, string);
-void hash(string&);
+void hhash(string&);
 
 #endif

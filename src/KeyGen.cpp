@@ -158,6 +158,15 @@ void keyGen(const string & PK_file,const string & SK_file,const string & identit
     fclose(PK);
     fclose(SK);
 
+    printf("Signing sertificate...\n");
+    if (CAsig == "") {
+        printf("No Key provided...self-signing...\n");
+        signCertificate(PK_file, SK_file);
+    }else{
+        signCertificate(PK_file, CAsig);
+    }
+
+
     BN_CTX_free(x);
     BN_free(N);
     BN_free(e);
@@ -193,12 +202,6 @@ int passFermatTest(BIGNUM *prime){
             break;
         }
     }
-
-//    a = (char*)malloc(sizeof(char)*300);
-//    for (i= 0; i<300;i++) a[i] = '\0';
-//    a = BN_bn2dec(groupMember);
-//    printf ("Check group member : %s\n", a);
-//    free (a);
 
     BN_mod_exp(rem, groupMember, p_minus1, prime, x);
 

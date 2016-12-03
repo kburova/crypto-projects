@@ -3,6 +3,7 @@
 #include<string>
 #include<openssl/bn.h>
 #include<openssl/sha.h>
+#include <iostream>
 #include"sig.h"
 #include"rsa.h"
 
@@ -14,7 +15,7 @@ void sig(string PK_file, string message, string& signature)
 {
    RSA_obj sig;
 
-   hash(message);
+   hhash(message);
    sig.RSAEncrypt(PK_file, message, signature);
 
    return;
@@ -25,7 +26,7 @@ bool verify(string SK_file, string signature, string message)
    RSA_obj sig;
    string newMessage;
 
-   hash(message);
+   hhash(message);
    sig.RSADecrypt(SK_file, signature, newMessage);
 
    if(message == newMessage) return true;
@@ -33,7 +34,7 @@ bool verify(string SK_file, string signature, string message)
    return false;
 }
 
-void hash(string& message)
+void hhash(string& message)
 {
    unsigned char md[SHA256_DIGEST_LENGTH];
    SHA256_CTX context;
@@ -49,7 +50,7 @@ void hash(string& message)
       sprintf(hash+j,"%02X",md[i]);
    }
    message = hash;
-
+    std::cout <<"Hash: "<< hash << std::endl;
    return;
 }
 
