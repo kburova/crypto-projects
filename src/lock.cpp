@@ -29,6 +29,10 @@ dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, 
         perror("Couldn't open directory to read files");
         exit(1);
     }
+    string temp = "rm " + dirName + "/SharedKeys";
+    system(temp.c_str());
+   temp = "rm " + dirName + "/*.enc";
+    system(temp.c_str());
     for (de = readdir(dir); de != NULL; de = readdir(dir)){
 
         sprintf(s, "%s/%s", d.c_str(), de->d_name);
@@ -109,7 +113,8 @@ void dirToLock::encryptFiles(){
         input = (char*) malloc(sizeof(char) * inp.size() + 1);
         memcpy(input, inp.c_str(), inp.size());
         input[inp.size()] = '\0';
-        printf ("%s\n", input);
+
+        printf ("Input before aes:  %s\n", input);
         AES aes;
 
         key = BN_bn2hex(encKey);
