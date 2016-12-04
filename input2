@@ -1,6 +1,8 @@
-DirectoryToLock
-LockingPartyFiles/PublicKey.txt
-LockingPartyFiles/SecretKey.txt
-LockingPartyFiles/CertSignature.txt
-UnlockingPartyFiles/PublicKey.txt
-UnlockingPartyFiles/CertSignature.txt
+/DirectoryToLock
+/LockingPartyFiles/LockPK.txt
+/LockingPartyFiles/LockSK.txt
+/LockingPartyFiles/LockSig.txt
+/UnlockingPartyFiles/UnlockPK.txt
+/UnlockingPartyFiles/UnlockSig.txt
+/CAfiles/CApk.txt
+/CAfiles/CAsig.txt

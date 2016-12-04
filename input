@@ -1,6 +1,8 @@
 /Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/DirectoryToLock
-/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/LockingPartyFiles/PublicKey.txt
-/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/LockingPartyFiles/SecretKey.txt
-/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/LockingPartyFiles/CertSignature.txt
-/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/UnlockingPartyFiles/PublicKey.txt
-/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/UnlockingPartyFiles/CertSignature.txt
+/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/LockingPartyFiles/LockPK.txt
+/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/LockingPartyFiles/LockSK.txt
+/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/LockingPartyFiles/LockSig.txt
+/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/UnlockingPartyFiles/UnlockPK.txt
+/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/UnlockingPartyFiles/UnlockSig.txt
+/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/CAfiles/CApk.txt
+/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/CAfiles/CAsig.txt
