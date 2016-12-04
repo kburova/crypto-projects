@@ -24,9 +24,10 @@ AES::AES()
 	for(i=0;i<16;i++) outputBlock[i] = 0;
 }
 
-void AES::setKey(int size, char* textKey)
+void AES::setKey(char* textKey)
 {
 	int i;				// loop itterator
+   int size = strlen(textKey);
 	keySize = size*4;
 	key[size/2] = 0;
 
