@@ -25,19 +25,36 @@ class dirToLock{
 protected:
 
     DIR *dir;
+    string dirName;
+    string fileForKeys;
     struct dirent *de;
     vector <string> dirFiles;
 
-    key *personPK;
-    BIGNUM *personSig;
+    //requesting party
+    string uPKfile;
+    key personPK;
+    string personSig;
 
-    key *lockerPK;
-    key *lockerSK;
-    BIGNUM *lockerSig;
+    //locking party
+    string PKfile;
+    string SKfile;
+    key lockerPK;
+    key lockerSK;
+    string lockerSig;
+
+    BIGNUM *encKey;
+    BIGNUM *macKey;
 
 public:
 
     dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS);
+    void readKeyFile(string& fileName, key &k);
+    void readSigFile(string& fileName, string & Sig);
+    void dirToStr(string &d, string & m);
+    void verifyPKeys();
+    void generateAESKeys();
+    void encryptFiles();
+
     void lock();
 
 };

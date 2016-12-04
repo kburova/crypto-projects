@@ -28,6 +28,7 @@ bool verify(string SK_file, string signature, string message)
 
    hhash(message);
    sig.RSADecrypt(SK_file, signature, newMessage);
+   cout << "decription worked"<<endl;
 
    if(message == newMessage) return true;
 
@@ -50,7 +51,7 @@ void hhash(string& message)
       sprintf(hash+j,"%02X",md[i]);
    }
    message = hash;
-    std::cout <<"Hash: "<< hash << std::endl;
+    //std::cout <<"Hash: "<< hash << std::endl;
    return;
 }
 

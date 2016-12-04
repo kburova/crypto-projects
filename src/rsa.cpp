@@ -51,20 +51,20 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 	// determine size of the cypher block string;
 	cCatch = BN_bn2hex(&N);
 	cypherSize = strlen(cCatch);
-cout << "cypherSize  " << cypherSize << endl;
+//cout << "cypherSize  " << cypherSize << endl;
 	OPENSSL_free(cCatch);
 
 	// determine the size of everything
 	mSize = message.size()/2;
-cout << "mSize  " << mSize << endl;
+//cout << "mSize  " << mSize << endl;
 	mBlockSize = (n/16) - 3;
-cout << "mBlockSize  " << mBlockSize << endl;
+//cout << "mBlockSize  " << mBlockSize << endl;
 	numBlocks = (mSize/mBlockSize)+1;
-cout << "numBlocks  " << numBlocks << endl;
+//cout << "numBlocks  " << numBlocks << endl;
 	lBlockSize = (mSize-((mSize/mBlockSize)*mBlockSize))*2;
-cout << "lBlockSize  " << lBlockSize << endl;
+//cout << "lBlockSize  " << lBlockSize << endl;
 	padSize = mBlockSize-(mSize-((mSize/mBlockSize)*mBlockSize));
-cout << "padSize  " << padSize << endl;
+//cout << "padSize  " << padSize << endl;
 
 	// allocate all the dynamic memory
 	mCpy = (char*)malloc(message.size()+1);
@@ -76,7 +76,7 @@ cout << "padSize  " << padSize << endl;
 	// set string itterators
 	mPtr = mCpy;
 	cPtr = cypher;
-cout << "difference: " << cPtr - cypher << endl;
+//cout << "difference: " << cPtr - cypher << endl;
 	mConPtr = mCon;
 
 	strcpy(mCpy,message.c_str());
@@ -111,11 +111,11 @@ cout << "difference: " << cPtr - cypher << endl;
 		}   
 		mConPtr = mCon;
 
-cout << "mCon: ";
-      for(int k = 0; k< (n/8); k++){
-         printf("%02X",mCon[k]);
-      }
-cout << endl;
+//cout << "mCon: ";
+//      for(int k = 0; k< (n/8); k++){
+//         printf("%02X",mCon[k]);
+//      }
+//cout << endl;
 		// convert to BN and do the math then back to hex string;
 		BN_bin2bn(mCon, n/8, &m);
 		BN_mod_exp(&c, &m, &key, &N, ctx);
@@ -126,7 +126,7 @@ cout << endl;
 		if(testSize)
 		{
 
-cout << "INSIDE TEST" << endl;
+//cout << "INSIDE TEST" << endl;
 
 			for(j=0;j<testSize;j++)
 			{
@@ -134,13 +134,13 @@ cout << "INSIDE TEST" << endl;
 			}
 			memcpy(cPtr+testSize, cCatch, cypherSize-testSize);
 			cPtr += cypherSize;
-cout << "difference: " << cPtr - cypher << endl;
+//cout << "difference: " << cPtr - cypher << endl;
 		}
 		else
 		{
 			memcpy(cPtr, cCatch, cypherSize);
 			cPtr += cypherSize;
-cout << "difference: " << cPtr - cypher << endl;
+//cout << "difference: " << cPtr - cypher << endl;
 		}
 		OPENSSL_free(cCatch);
 	}
@@ -170,11 +170,11 @@ cout << "difference: " << cPtr - cypher << endl;
 	mConPtr += lBlockSize/2;
 	memset(mConPtr,0,padSize);
 	mCon[(n/8)-1]=padSize;
-cout << "mCon: ";
-      for(int k = 0; k< (n/8); k++){
-         printf("%02X",mCon[k]);
-      }
-cout << endl;
+//cout << "mCon: ";
+//      for(int k = 0; k< (n/8); k++){
+//         printf("%02X",mCon[k]);
+//      }
+//cout << endl;
 
 	BN_bin2bn(mCon, n/8, &m);
 	BN_mod_exp(&c, &m, &key, &N, ctx);
@@ -190,17 +190,17 @@ cout << endl;
 		}
 		memcpy(cPtr+testSize, cCatch, cypherSize-testSize);
 		cPtr += cypherSize;
-cout << "difference: " << cPtr - cypher << endl;
+//cout << "difference: " << cPtr - cypher << endl;
 	}
 	else
 	{
 		memcpy(cPtr, cCatch, cypherSize);
 		cPtr += cypherSize;
-cout << "difference: " << cPtr - cypher << endl;
+//cout << "difference: " << cPtr - cypher << endl;
 	}
    cPtr[0] = 0;
 	OPENSSL_free(cCatch);
-	printf("Cipher: %s\nSize: %d\n", cypher, (int)strlen(cypher));
+//	printf("Cipher: %s\nSize: %d\n", cypher, (int)strlen(cypher));
 	fflush(stdout);
 	output = cypher;
 
@@ -236,8 +236,8 @@ void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 	BIGNUM c;									// cypher block in BIGNUM form;
 	BN_CTX* ctx;								// not realy sure what this is for;
 
-cout << input << endl << input.size() << endl;
-cout << output << endl << output.size() << endl;
+//cout << input << endl << input.size() << endl;
+//cout << output << endl << output.size() << endl;
 	// initalize BIGNUM objs
 	BN_init(&m);
 	BN_init(&c);
@@ -249,16 +249,16 @@ cout << output << endl << output.size() << endl;
 	// determine size of the cypher block string;
 	cCatch = BN_bn2hex(&N);
 	cypherBlockSize = strlen(cCatch);
-cout << "cypherBlockSize  " << cypherBlockSize << endl;
+//cout << "cypherBlockSize  " << cypherBlockSize << endl;
 	OPENSSL_free(cCatch);
 	
 	// determine the sizes that we need
 	cypherSize = input.size();
-cout << "cypherSize  " << cypherSize << endl;
+//cout << "cypherSize  " << cypherSize << endl;
 	numBlocks = cypherSize/cypherBlockSize;
-cout << "numBlocks  " << numBlocks << endl;
+//cout << "numBlocks  " << numBlocks << endl;
 	mBlockSize = (n/16) - 3;
-cout << "mBlockSize  " << mBlockSize << endl;
+//cout << "mBlockSize  " << mBlockSize << endl;
 
 	// allocate the memory that we need.
 	cypher = (char*)malloc(cypherSize+1);
@@ -291,7 +291,7 @@ cout << "mBlockSize  " << mBlockSize << endl;
 			cBlock[j*2] = 0;
 		}
 		
-cout << "10" << endl;
+//cout << "10" << endl;
 		// decrypt
 		BN_bin2bn(cCon, cypherBlockSize/2, &c);
 		BN_mod_exp(&m, &c, &key, &N, ctx);
@@ -299,7 +299,7 @@ cout << "10" << endl;
 		cBPtr = cCatch;
 		cBPtr += strlen(cCatch)-mBlockSize*2;
 
-cout << "11" << endl;
+//cout << "11" << endl;
 		// extract message block and append to message string
 		memcpy(mPtr, cBPtr, mBlockSize*2);
 		mPtr += mBlockSize*2;
@@ -307,13 +307,13 @@ cout << "11" << endl;
 		OPENSSL_free(cCatch);
 	}
 
-cout << "12" << endl;
+//cout << "12" << endl;
 	// grab last block 
 	memcpy(cBlock, cPtr, cypherBlockSize);
 	cBlock[cypherBlockSize] = 0;
 	cPtr += cypherBlockSize;
 
-cout << "13" << endl;
+//cout << "13" << endl;
 	// convert hex string to hex
 	for(j = (cypherBlockSize/2)-1; j >= 0; j--)
 	{   
@@ -321,35 +321,35 @@ cout << "13" << endl;
 		cBlock[j*2] = 0;
 	}
 	
-cout << "14" << endl;
+//cout << "14" << endl;
 	// cectypt
 	BN_bin2bn(cCon, cypherBlockSize/2, &c);
 	BN_mod_exp(&m, &c, &key, &N, ctx);
 	cCatch = BN_bn2hex(&m);
-cout << cCatch << endl;
+//cout << cCatch << endl;
 	cBPtr = cCatch;
 	cBPtr += strlen(cCatch)-mBlockSize*2;
 
-cout << "15" << endl;
+//cout << "15" << endl;
 	// discover padding
 	padSize = (unsigned char) strtol(cBPtr+(strlen(cBPtr)-2),NULL,16);
 
-cout << padSize << endl;
-cout << mBlockSize << endl;
-cout << mBlockSize*2-padSize*2 << endl;
-cout << "16" << endl;
+//cout << padSize << endl;
+//cout << mBlockSize << endl;
+//cout << mBlockSize*2-padSize*2 << endl;
+//cout << "16" << endl;
 	// extract message
 	memcpy(mPtr, cBPtr, mBlockSize*2-padSize*2);
 	mPtr += mBlockSize*2-padSize*2;
 	*mPtr = 0;
 
-cout << "17" << endl;
+//cout << "17" << endl;
 	OPENSSL_free(cCatch);
 
-cout << "18" << endl;
+//cout << "18" << endl;
 	output = message;
 
-cout << "16" << endl;
+//cout << "16" << endl;
 	free(mCpy);
 	free(message);
 	free(cCon);
