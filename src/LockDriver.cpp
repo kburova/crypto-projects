@@ -8,7 +8,7 @@ int main(int argc, char** argv){
 
 
     string dir, PK, SK, SIG, userPK, userSIG;
-    ifstream in("input2");
+    ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/input");
     cin.rdbuf(in.rdbuf());
 
     cout << "Enter path for directory to lock" << endl;
@@ -31,6 +31,7 @@ int main(int argc, char** argv){
 //         << userPK <<endl
 //         << userSIG <<endl;
 
+    cout <<endl;
     dirToLock dirObj(dir, PK, SK, SIG, userPK, userSIG);
     dirObj.verifyPKeys();
     dirObj.generateAESKeys();

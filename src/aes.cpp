@@ -78,14 +78,13 @@ char* AES::CBCencrypt(char* input)
 
 	AES_set_encrypt_key(key, keySize, &AESKey);
 
-	printf ("Key inside of AES: %s\n", key) ;
+	//printf ("Key inside of AES: %s\n", key) ;
 	inputPtr = input;
-	printf ("Input inside of AES: %s\n", inputPtr) ;
+	//printf ("Input inside of AES: %s\n", inputPtr) ;
 
 	// cpy the message into inputBlocks and encrypt them
 	for(i=0; i<numBlocks-1; i++)
 	{
-		cout << "Block "<< i <<endl;
 		memcpy(temp,inputPtr,32);
 		inputPtr += 32;
 		temp[32] = 0;
@@ -154,7 +153,6 @@ char* AES::CBCencrypt(char* input)
 	outputPtr += 32;
 	*outputPtr = 0;
 
-	printf ("Output: %s\n", output);
 	return output;
 }
 

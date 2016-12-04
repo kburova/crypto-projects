@@ -2,3 +2,4 @@ g++ -o mac MAC.cpp -std=c++11 -lcrypto -lssl -I/usr/local/opt/openssl/include -L
 
 
 set(SOURCE_FILES src/rsaDriver.cpp src/rsa.cpp src/KeyGen.cpp src/certGen.cpp src/sig.cpp )
+set(SOURCE_FILES src/LockDriver.cpp src/lock.cpp src/sig.cpp src/rsa.cpp src/aes.cpp src/MAC.cpp)
