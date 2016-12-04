@@ -32,29 +32,18 @@ int main(int argc, char** argv)
 
 	parameter_check(argc, argv);
 
-	fileSize = open_check(in, argv[3]);
+    fileSize = open_check(in, argv[3]);
 
-	string temp;
-	while (getline(in,temp) ){
-		if (temp == "---Encryption key---"){
-			getline(in,temp);
-			keySize = temp.length();
-			break;
-		}
-	}
-	// check for proper key size
-	if(keySize*4 != 256 && keySize*4 != 192 && keySize*4 != 128)
-	{
-		cout << "file size = " << fileSize << endl;
-		cout << "key size = " << keySize * 4 << endl;
-		cout << "\nError: Improper key size\n\n";
-		exit(0);
-	}
+    // check for proper key size
+    if(fileSize*4 != 256 && fileSize*4 != 192 && fileSize*4 != 128)
+    {
+        cout << "\nError: Improper key size\n\n";
+        exit(0);
+    }
 
-	key = (char*)malloc(sizeof(char)*keySize+1);
-	key = temp.c_str();
-	//in.getline(key,fileSize+1);
-	in.close();
+    key = (char*)malloc(sizeof(char)*fileSize+1);
+    in.getline(key,fileSize+1);
+    in.close();
 
 	aes.setKey(fileSize, key);
 
@@ -90,7 +79,7 @@ int main(int argc, char** argv)
 	out.open(argv[5], out.out);
 	if(out.fail())
 	{
-		cout << "Error: " << perror << endl;
+		cout << "Error: " << endl;
 		exit(0);
 	}
 

@@ -1,0 +1,6 @@
+../DirectoryToLock
+../LockingPartyFiles/PublicKey.txt
+../LockingPartyFiles/SecretKey.txt
+../LockingPartyFiles/CertSignature.txt
+../UnlockingPartyFiles/PublicKey.txt
+../UnlockingPartyFiles/CertSignature.txt
