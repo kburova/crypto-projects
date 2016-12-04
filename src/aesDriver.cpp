@@ -58,22 +58,22 @@ int main(int argc, char** argv)
 	{
 		if(strcmp(argv[2], "-e")==0)
 		{
-			output = aes.CBCencrypt(fileSize, input);
+			output = aes.CBCencrypt(input);
 		}
 		else
 		{
-			output = aes.CBCdecrypt(fileSize, input);
+			output = aes.CBCdecrypt(input);
 		}
 	}
 	else
 	{
 		if(strcmp(argv[2], "-e")==0)
 		{
-			output = aes.CTRencrypt(fileSize, input);
+			output = aes.CTRencrypt(input);
 		}
 		else
 		{
-			output = aes.CTRdecrypt(fileSize, input);
+			output = aes.CTRdecrypt(input);
 		}
 	}
 
