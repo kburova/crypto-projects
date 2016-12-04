@@ -13,7 +13,7 @@ clean:
 	rm -f $(OBJ)/* $(BIN)/*
 
 $(BIN)/lock: $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o 
-	$(CC) -o $(BIN)/lock $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o
+	$(CC) -o $(BIN)/lock $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o $(FLAGS)
 
 $(BIN)/rsa: $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(OBJ)/certGen.o $(OBJ)/sig.o
 	$(CC) -o $(BIN)/rsa $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(OBJ)/certGen.o $(OBJ)/sig.o $(FLAGS)
