@@ -7,8 +7,9 @@ using namespace std;
 int main(int argc, char** argv){
 
 
-    string dir, PK, SK, SIG, userPK, userSIG;
-    ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/input");
+    string dir, PK, SK, SIG, userPK, userSIG, caPK,caSIG;
+   // ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/input");
+    ifstream in("input2");
     cin.rdbuf(in.rdbuf());
 
     cout << "Enter path for directory to lock" << endl;
@@ -25,14 +26,13 @@ int main(int argc, char** argv){
     cout << "Enter path for user's signature" << endl;
     cin >> userSIG;
 
-//    cout << PK <<endl
-//         << SK <<endl
-//         << SIG << endl
-//         << userPK <<endl
-//         << userSIG <<endl;
+    cout << "Enter path for CA's Public Key" << endl;
+    cin >> caPK;
+    cout << "Enter path for CA's signature" << endl;
+    cin >> caSIG;
 
     cout <<endl;
-    dirToLock dirObj(dir, PK, SK, SIG, userPK, userSIG);
+    dirToLock dirObj(dir, PK, SK, SIG, userPK, userSIG, caPK, caSIG);
     dirObj.verifyPKeys();
     dirObj.generateAESKeys();
     dirObj.encryptFiles();

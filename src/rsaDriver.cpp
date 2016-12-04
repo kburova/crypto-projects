@@ -14,6 +14,9 @@ int main(int argc, char** argv){
     string cypher;
     ifstream PK, SK, in;
     ofstream out;
+	bool self;
+	string CAsig = "/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/CAfiles/CAsk.txt";
+
 	cout << "Choose a task: \n"
 		<< "1  -  Key Generation\n"
 		<< "2  -  RSA Encryption\n"
@@ -28,8 +31,14 @@ int main(int argc, char** argv){
 			cin >> SK_file;
 			cout << "Enter your identity" <<endl;
 			cin >> identity;
+			cout << "Is it self signed? 1(yes), 0(no)" <<endl;
+			cin >> self;
 			cout<<endl;
-			keyGen(PK_file, SK_file, identity);
+			if (self){
+				keyGen(PK_file, SK_file, identity);
+			}else{
+				keyGen(PK_file, SK_file, identity, CAsig);
+			}
 			break;
 		case 2:
 PK_file = "files/SK";

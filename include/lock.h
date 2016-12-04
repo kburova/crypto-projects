@@ -26,18 +26,24 @@ protected:
     string uPKfile;
     string personSig;
     string uSigFile;
+
     //locking party
     string PKfile;
     string SKfile;
     string SigFile;
     string lockerSig;
 
+    //CAfiles
+    string caSigFile;
+    string caPKfile;
+    string caSig;
+
     BIGNUM *encKey;
     BIGNUM *macKey;
 
 public:
 
-    dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS);
+    dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS, string &caPK, string &caSIG);
     void readSigFile(string& fileName, string & Sig);
     void dirToStr(string &d, string & m);
     void verifyPKeys();

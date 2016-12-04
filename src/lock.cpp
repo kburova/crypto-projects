@@ -8,7 +8,7 @@
 #include "mac.h"
 #include "rsa.h"
 
-dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS){
+dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS, string &caPK, string &caSIG){
 
     char *s;
     struct stat buf;
@@ -21,6 +21,8 @@ dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, 
     uPKfile = uPK;
     SigFile = S;
     uSigFile = uS;
+    caSigFile = caSIG;
+    caPKfile = caPK;
 
     // open directory and save all files (names) to vector for ease of implementation
     s = (char *) malloc(sizeof(char)*(strlen(d.c_str())+258));
@@ -55,6 +57,8 @@ dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, 
     readSigFile(S, lockerSig);
         //requester
     readSigFile(uS, personSig);
+        //CA
+    readSigFile(caSIG, caSig);
 }
 
 void dirToLock::generateAESKeys() {
@@ -235,24 +239,35 @@ void dirToLock::verifyPKeys(){
 
     bool client = false;
     bool locker = false;
+    bool CA = false;
     string message;
 
+    printf("Verifying CA...\n");
+    dirToStr(caPKfile, message);
+    CA = verify(caPKfile, caSig , message);
+    if (!CA) {
+        cerr << "CA is not verified"<< endl;
+    }
+
+    printf("Verifying requesting party...\n");
     dirToStr(uPKfile, message);
-    client = verify(uPKfile, personSig ,message);
+    client = verify(caPKfile, personSig ,message);
     if (!client) {
         cerr << "Requesting party is not verified"<< endl;
     }
+
+    printf("Verifying locking party...\n");
     dirToStr(PKfile, message);
-    locker = verify(PKfile, lockerSig, message);
+    locker = verify(caPKfile, lockerSig, message);
     if (!locker){
         cerr << "Locking party is not verified"<< endl;
     }
 
-    if (! (client && locker) ){
+    if (! (client && locker && CA) ){
         cerr << "Aborting..." << endl;
         exit(1);
     }else{
-        cout << "Both parties verified successfully..." <<endl;
+        cout << "All parties verified successfully..." <<endl;
     }
 
     string temp = "cp " + PKfile + " " + dirName;
