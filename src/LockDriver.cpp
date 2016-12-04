@@ -8,8 +8,8 @@ int main(int argc, char** argv){
 
 
     string dir, PK, SK, SIG, userPK, userSIG;
-  //  ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/input");
-   // cin.rdbuf(in.rdbuf());
+    ifstream in("input2");
+    cin.rdbuf(in.rdbuf());
 
     cout << "Enter path for directory to lock" << endl;
     cin >> dir;

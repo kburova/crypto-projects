@@ -25,7 +25,7 @@ private:
 
 public:
 	AES();
-	void setKey(int, char*);
+	void setKey(char*);
 	char* CBCencrypt(char*);
 	char* CBCdecrypt(char*);
 	char* CTRencrypt(char*);

@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     in.getline(key,fileSize+1);
     in.close();
 
-	aes.setKey(fileSize, key);
+	aes.setKey(key);
 
 
 	fileSize = open_check(in, argv[4]);
