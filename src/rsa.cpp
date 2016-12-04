@@ -84,6 +84,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 	// copy the message blocks, get some randomness, and build the string that
 	// gets converted to a BIGNUM.  Do the math on it and convert it back to a
 	// hex string
+   cout << "Breaking down the message..." << endl;
 	for(i=0; i<numBlocks-1; i++)
 
 	{
@@ -116,6 +117,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 //         printf("%02X",mCon[k]);
 //      }
 //cout << endl;
+      cout << "Encrypting..." << endl;
 		// convert to BN and do the math then back to hex string;
 		BN_bin2bn(mCon, n/8, &m);
 		BN_mod_exp(&c, &m, &key, &N, ctx);
@@ -175,6 +177,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 //         printf("%02X",mCon[k]);
 //      }
 //cout << endl;
+   cout << "Encrypting..." << endl;
 
 	BN_bin2bn(mCon, n/8, &m);
 	BN_mod_exp(&c, &m, &key, &N, ctx);
@@ -201,7 +204,8 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
    cPtr[0] = 0;
 	OPENSSL_free(cCatch);
 //	printf("Cipher: %s\nSize: %d\n", cypher, (int)strlen(cypher));
-	fflush(stdout);
+//	fflush(stdout);
+   cout << "Copying to a string..." << endl;
 	output = cypher;
 
 	free(mCon);
@@ -212,6 +216,9 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 	BN_free(&m);
 	BN_free(&c);
 	BN_CTX_free(ctx);
+
+   cout << "DONE" << endl;
+
 	return;
 }
 
@@ -267,7 +274,7 @@ void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 	mCpy = (char*)malloc(mBlockSize);
 	message = (char*)malloc(mBlockSize*2*numBlocks);
 	
-
+   cout << "Breaking down the cypher..." << endl;
 	memcpy(cypher, input.c_str(), cypherSize);
 	cypher[cypherSize] = 0;
 
@@ -292,6 +299,7 @@ void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 		}
 		
 //cout << "10" << endl;
+      cout << "Decrypting..." << endl;
 		// decrypt
 		BN_bin2bn(cCon, cypherBlockSize/2, &c);
 		BN_mod_exp(&m, &c, &key, &N, ctx);
@@ -322,7 +330,8 @@ void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 	}
 	
 //cout << "14" << endl;
-	// cectypt
+	// dectypt
+   cout << "Decrypting..." << endl;
 	BN_bin2bn(cCon, cypherBlockSize/2, &c);
 	BN_mod_exp(&m, &c, &key, &N, ctx);
 	cCatch = BN_bn2hex(&m);
@@ -347,6 +356,7 @@ void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 	OPENSSL_free(cCatch);
 
 //cout << "18" << endl;
+   cout << "Copying message to a string..." << endl;
 	output = message;
 
 //cout << "16" << endl;
@@ -358,6 +368,8 @@ void RSA_obj::RSADecrypt(string keyFile, string input, string& output)
 	BN_free(&m);
 	BN_free(&c);
 	BN_CTX_free(ctx);
+
+   cout << "DONE" << endl;
 	return;
 }
 

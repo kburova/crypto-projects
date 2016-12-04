@@ -5,12 +5,15 @@ OBJ = obj
 SRC = src
 FLAGS = -lssl -lcrypto -I$(INC) -I/usr/local/opt/openssl/include
 DIR = /usr/local/opt/openssl
-MAC = -std=c++11 -lcrypto -lssl
+MAC = -std=c++11 -lssl -lcrypto
 
-all: $(BIN)/rsa $(BIN)/aes $(BIN)/mac $(BIN)/sig
+all: $(BIN)/rsa $(BIN)/aes $(BIN)/mac $(BIN)/sig $(BIN)/lock
 
 clean:
 	rm -f $(OBJ)/* $(BIN)/*
+
+$(BIN)/lock: $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o 
+	$(CC) -o $(BIN)/lock $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o
 
 $(BIN)/rsa: $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(OBJ)/certGen.o $(OBJ)/sig.o
 	$(CC) -o $(BIN)/rsa $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(OBJ)/certGen.o $(OBJ)/sig.o $(FLAGS)
@@ -23,6 +26,9 @@ $(BIN)/sig: $(OBJ)/sigDriver.o $(OBJ)/sig.o $(OBJ)/rsa.o
 
 $(OBJ)/rsaDriver.o: $(SRC)/rsaDriver.cpp
 	$(CC) -c -o $(OBJ)/rsaDriver.o $(SRC)/rsaDriver.cpp $(FLAGS)
+
+$(OBJ)/LockDriver.o: $(SRC)/LockDriver.cpp
+	$(CC) -c -o $(OBJ)/LockDriver.o $(SRC)/LockDriver.cpp $(FLAGS)
 
 $(OBJ)/KeyGen.o: $(SRC)/KeyGen.cpp $(INC)/rsa.h
 	$(CC) -c -o $(OBJ)/KeyGen.o $(SRC)/KeyGen.cpp $(FLAGS)
@@ -44,6 +50,9 @@ $(OBJ)/sig.o: $(SRC)/sig.cpp $(INC)/sig.h
 
 $(OBJ)/certGen.o: $(SRC)/certGen.cpp $(INC)/rsa.h
 	$(CC) -c -o $(OBJ)/certGen.o $(SRC)/certGen.cpp $(FLAGS)
+
+$(OBJ)/lock.o: $(SRC)/lock.cpp $(INC)/lock.h
+	$(CC) -c -o $(OBJ)/lock.o $(SRC)/lock.cpp $(FLAGS)
 
 $(BIN)/mac: $(SRC)/MAC.cpp
 	$(CC) -o $(BIN)/mac $(SRC)/MAC.cpp $(MAC)

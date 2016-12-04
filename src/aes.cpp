@@ -43,9 +43,10 @@ void AES::setKey(int size, char* textKey)
 	return;	
 }
 
-char* AES::CBCencrypt(int size, char* input)
+char* AES::CBCencrypt(char* input)
 {
 	int i,j;								// loop itterators
+   int size;
 	int fieldPad;						// invers string pad size
 	char temp[33];						// converter string
 	char* inputPtr;					// points to cur loc in input string
@@ -54,6 +55,7 @@ char* AES::CBCencrypt(int size, char* input)
 
 
 	// determine the number of blocks and the size of the padding
+   size = strlen(input);
 	padSize = 16-((size%32)/2);
 	numBlocks = (size/32)+1;
 	fieldPad = size%32;
@@ -155,9 +157,10 @@ char* AES::CBCencrypt(int size, char* input)
 	return output;
 }
 
-char* AES::CBCdecrypt(int size, char* input)
+char* AES::CBCdecrypt(char* input)
 {
 	int i, j;							// loop itterators
+   int size;
 	int padSize;						// extracted pad size
 	int inputSize;						// Size of the cypher message
 	int outputSize;					// Size of the resulting message
@@ -169,6 +172,7 @@ char* AES::CBCdecrypt(int size, char* input)
 	char storeC[32];					// holds untill next block is deciphered
 
 	AES_set_decrypt_key(key, keySize, &AESKey);
+   size = strlen(input);
 
 	inputPtr = input;
 	inputSize = strlen(input);
@@ -257,9 +261,10 @@ char* AES::CBCdecrypt(int size, char* input)
 	return output;
 }
 
-char* AES::CTRencrypt(int size, char* input)
+char* AES::CTRencrypt(char* input)
 {
 	int i,j;								// loop itterators
+   int size;
 	int fieldPad;						// inverse string pad size
 	char temp[33];						// converter string
 	char* inputPtr;					// points to cur loc in input string
@@ -267,6 +272,7 @@ char* AES::CTRencrypt(int size, char* input)
 	char* outputPtr;					// points to cur loc in output string
 
 	// determine the number of blocks and the size of the padding
+   size = strlen(input);
 	padSize = 16-((size%32)/2);
 	numBlocks = (size/32)+1;
 	fieldPad = size%32;
@@ -362,9 +368,10 @@ char* AES::CTRencrypt(int size, char* input)
 	return output;
 }
 
-char* AES::CTRdecrypt(int size, char* input)
+char* AES::CTRdecrypt(char* input)
 {
 	int i, j;							// loop itterators
+   int size;
 	int padSize;						// extracted pad size
 	int inputSize;						// Size of the cypher message
 	int outputSize;					// Size of the resulting message
@@ -379,6 +386,7 @@ char* AES::CTRdecrypt(int size, char* input)
 	AES_set_decrypt_key(key, keySize, &AESKey);
 
 	// get the size of the input and the number of blocks
+   size = strlen(input);
 	inputPtr = input;
 	inputSize = strlen(input);
 	numBlocks = inputSize / 32;

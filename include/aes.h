@@ -26,10 +26,10 @@ private:
 public:
 	AES();
 	void setKey(int, char*);
-	char* CBCencrypt(int, char*);
-	char* CBCdecrypt(int, char*);
-	char* CTRencrypt(int, char*);
-	char* CTRdecrypt(int, char*);
+	char* CBCencrypt(char*);
+	char* CBCdecrypt(char*);
+	char* CTRencrypt(char*);
+	char* CTRdecrypt(char*);
 };
 
 #endif
