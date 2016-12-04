@@ -178,6 +178,7 @@ void RSA_obj::RSAEncrypt(string keyFile, string message, string& output)
 //      }
 //cout << endl;
    cout << "Encrypting..." << endl;
+
 	BN_bin2bn(mCon, n/8, &m);
 	BN_mod_exp(&c, &m, &key, &N, ctx);
 	cCatch = BN_bn2hex(&c);

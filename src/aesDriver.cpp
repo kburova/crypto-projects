@@ -27,27 +27,37 @@ int main(int argc, char** argv)
 	ifstream in;			// filestream for input
 	ofstream out;			// filestream for output
 //	FILE* out;				// filestream for output
-	int fileSize;			// size of the file in bytes
+	int fileSize,keySize;			// size of the file in bytes
 	AES aes;					// creats the AES object
 
 	parameter_check(argc, argv);
 
 	fileSize = open_check(in, argv[3]);
 
+	string temp;
+	while (getline(in,temp) ){
+		if (temp == "---Encryption key---"){
+			getline(in,temp);
+			keySize = temp.length();
+			break;
+		}
+	}
 	// check for proper key size
-	if(fileSize*4 != 256 && fileSize*4 != 192 && fileSize*4 != 128)
+	if(keySize*4 != 256 && keySize*4 != 192 && keySize*4 != 128)
 	{
 		cout << "file size = " << fileSize << endl;
-		cout << "key size = " << fileSize * 4 << endl;
+		cout << "key size = " << keySize * 4 << endl;
 		cout << "\nError: Improper key size\n\n";
 		exit(0);
 	}
 
-	key = (char*)malloc(sizeof(char)*fileSize+1);
-	in.getline(key,fileSize+1);
+	key = (char*)malloc(sizeof(char)*keySize+1);
+	key = temp.c_str();
+	//in.getline(key,fileSize+1);
 	in.close();
 
 	aes.setKey(fileSize, key);
+
 
 	fileSize = open_check(in, argv[4]);
 	input = (char*)malloc(sizeof(char)*fileSize+1);
