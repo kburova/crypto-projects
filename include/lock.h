@@ -11,14 +11,6 @@
 
 using namespace std;
 
-// INCLUDE KEY STRUCTURE TO HOLD ALL 3 PARAMS FOR EACH RSA KEY AT ONE PLACE
-struct key{
-
-    BIGNUM *k;
-    BIGNUM *N;
-    unsigned long int n;
-    string identity;
-};
 
 class dirToLock{
 
@@ -32,14 +24,12 @@ protected:
 
     //requesting party
     string uPKfile;
-    key personPK;
     string personSig;
-
+    string uSigFile;
     //locking party
     string PKfile;
     string SKfile;
-    key lockerPK;
-    key lockerSK;
+    string SigFile;
     string lockerSig;
 
     BIGNUM *encKey;
@@ -48,14 +38,13 @@ protected:
 public:
 
     dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS);
-    void readKeyFile(string& fileName, key &k);
     void readSigFile(string& fileName, string & Sig);
     void dirToStr(string &d, string & m);
     void verifyPKeys();
     void generateAESKeys();
     void encryptFiles();
-
-    void lock();
+    void encryptKeysFile();
+    void signFile(string & file);
 
 };
 

@@ -5,7 +5,8 @@
 #include "lock.h"
 #include "sig.h"
 #include "aes.h"
-
+#include "mac.h"
+#include "rsa.h"
 
 dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, string &uS){
 
@@ -18,38 +19,41 @@ dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, 
     PKfile = PK;
     SKfile = SK;
     uPKfile = uPK;
-
-
+    SigFile = S;
+    uSigFile = uS;
 
     // open directory and save all files (names) to vector for ease of implementation
-
     s = (char *) malloc(sizeof(char)*(strlen(d.c_str())+258));
     dir = opendir( d.c_str() );
     if (dir == NULL) {
         perror("Couldn't open directory to read files");
         exit(1);
     }
-    string temp = "rm " + dirName + "/SharedKeys";
-    system(temp.c_str());
-   temp = "rm " + dirName + "/*.enc";
-    system(temp.c_str());
+
+    //delete created files first (for debugging perposes
+//    string temp = "rm " + dirName + "/SharedKeys";
+//    system(temp.c_str());
+//    temp = "rm " + dirName + "/*.enc";
+//    system(temp.c_str());
+//    temp = "rm " + dirName + "/*.tag";
+//    system(temp.c_str());
+//    temp = "rm " + dirName + "/*.sig";
+//    system(temp.c_str());
+
     for (de = readdir(dir); de != NULL; de = readdir(dir)){
 
         sprintf(s, "%s/%s", d.c_str(), de->d_name);
         lstat(s, &buf);
 
+        //avoid encrypting ./ and ../
         if (! S_ISDIR(buf.st_mode) ) {
-            dirFiles.push_back(s);
+            dirFiles.push_back(de->d_name);
         }
     }
-
-    // START OPENING ALL FILES AND STORE KEYS INFORMATION INTO CLASS
+    // Store signatures
         //locker
-    readKeyFile(PK, lockerPK);
-    readKeyFile(SK, lockerSK);
     readSigFile(S, lockerSig);
         //requester
-    readKeyFile(uPK, personPK);
     readSigFile(uS, personSig);
 }
 
@@ -57,6 +61,8 @@ void dirToLock::generateAESKeys() {
 
     //create new file for storing keys
     FILE * SharedKeys;
+    string encFile;
+
     fileForKeys = dirName + "/SharedKeys";
 
     SharedKeys = fopen(fileForKeys.c_str(), "w");
@@ -65,6 +71,7 @@ void dirToLock::generateAESKeys() {
         exit(1);
     }
 
+    printf("Generating 'SharedKeys'...\n");
     encKey = BN_new();
     macKey = BN_new();
 
@@ -77,59 +84,134 @@ void dirToLock::generateAESKeys() {
     fprintf(SharedKeys, "---Macing key---\n");
     BN_print_fp(SharedKeys, macKey);
 
+    //encrypt file
+    printf("Encrypting 'SharedKeys'...\n");
+    encryptKeysFile();
+
+    //sign encrypted file
+    printf("Signing 'SharedKeys.enc'...\n\n");
+    encFile = fileForKeys + ".enc";
+    signFile(encFile);
     fclose(SharedKeys);
+
+    string temp = "rm " + fileForKeys;
+
+    system(temp.c_str());
 }
 
+void dirToLock::signFile(string & file) {
+
+    string message,signature;
+    ofstream keysSig;
+
+    keysSig.open(file + ".sig");
+    if (keysSig.fail() ){
+        fprintf(stderr, "Failed to open file for signature\n");
+        exit(1);
+    }
+
+    // sign file
+    dirToStr(file, message);
+    sig(SKfile, message, signature);
+
+    keysSig << signature;
+    keysSig.close();
+}
+
+
+void dirToLock::encryptKeysFile() {
+
+    RSA_obj enc;
+    ofstream encKeys;
+    string message, cypher;
+
+    encKeys.open(fileForKeys + ".enc");
+    if (encKeys.fail() ){
+        fprintf(stderr, "Failed to open file for encrypted shared keys\n");
+        exit(1);
+    }
+    // encrypt file
+    dirToStr(fileForKeys, message);
+    enc.RSAEncrypt(uPKfile, message, cypher);
+
+    //create .enc file
+    encKeys << cypher;
+    encKeys.close();
+
+}
 void dirToLock::encryptFiles(){
 
-
     ifstream from;
-    ofstream to;
+    ofstream to, tFile;
     stringstream ss;
     string inp;
-    string temp;
-    char *key;
+    string temp, tag;
+    char *eKey;
     char *output;
     char *input;
 
     for (string file : dirFiles) {
 
+        printf("Encryptitng '%s' ...\n", file.c_str());
+        file = dirName + "/" +file;
 
         from.open(file.c_str());
         if (from.fail()) {
-            perror("Error: Could open file to encrypt");
+            fprintf(stderr, "Couldn't open file for encryption -- %s\n", file.c_str());
             exit(1);
         }
         temp = file + ".enc";
         to.open(temp.c_str());
         if (to.fail()) {
-            perror("Error: Could open file to write encrypt");
+            fprintf(stderr, "Couldn't open file for encrypted text -- %s\n", temp.c_str());
+            exit(1);
+        }
+        temp = file +".tag";
+        tFile.open(temp);
+        if (tFile.fail()){
+            fprintf(stderr, "Couldn't open file for tag -- %s\n", temp.c_str());
             exit(1);
         }
 
         ss.clear();
         ss << from.rdbuf();
+
+        // convert c++ string to c string for encryption part
         inp = ss.str();
         input = (char*) malloc(sizeof(char) * inp.size() + 1);
         memcpy(input, inp.c_str(), inp.size());
         input[inp.size()] = '\0';
-        printf ("\n\n\n____input:  %s\n\n\n", input);
+
+        //Encrytion of the file
         AES aes;
-
-        key = BN_bn2hex(encKey);
-
-        printf ("____key:  %s\n", key);
-        aes.setKey(key);
-
-
+        eKey = BN_bn2hex(encKey);
+        aes.setKey(eKey);
         output = aes.CBCencrypt(input);
-        printf ("%s\n", output);
-
         to << output;
-
         to.close();
+
+        //Taging encrypted file
+        eKey = BN_bn2hex(macKey);
+        string mKey(eKey);
+        string mInput(output);
+        int size = mInput.size();
+
+        HashMacGen(mKey, mInput, size , tag);
+
+        char tmp[3];
+
+        printf("Generating tag...\n");
+        for (int i = 0; i < 16; i++){
+            sprintf( tmp, "%02x",  (unsigned char)(unsigned int)tag[i] );
+            tFile << tmp;
+        }
+
+        tFile.close();
         from.close();
         free(input);
+
+        string temp = "rm "+file;
+        system( temp.c_str() );
     }
 
 }
@@ -139,7 +221,7 @@ void dirToLock::dirToStr(string &d, string &m){
     stringstream ss;
     PK.open(d);
     if (PK.fail()){
-        perror("Error: Could open certificate");
+        perror("Error: Couldn't open certificate");
         exit(1);
     }
 
@@ -170,88 +252,13 @@ void dirToLock::verifyPKeys(){
         cerr << "Aborting..." << endl;
         exit(1);
     }else{
-        cout << "Both party verified successfully..." <<endl;
-    }
-}
-
-void dirToLock::lock(){
-
-}
-
-void dirToLock::readKeyFile(string& fileName, key &k) {
-    int i, size;
-    ifstream in;
-    string temp;
-    unsigned char *convert1;
-    char *convert2;
-
-    in.open(fileName.c_str(), in.in);
-    if(in.fail()) {
-        fprintf(stderr, "Couldn't open key file -- %s\n", fileName.c_str());
-        exit(1);
+        cout << "Both parties verified successfully..." <<endl;
     }
 
-    while (getline(in, temp)) {
-        /*** get N ***/
-        if (temp == "N:") {
-
-            getline(in,temp);
-            convert1 = (unsigned char *) malloc(temp.size() / 2);
-            convert2 = (char *) malloc(temp.size() + 1);
-            strcpy(convert2, temp.c_str());
-            if (temp.size() % 2) {
-                size = (temp.size() + 1) / 2;
-                for (i = size - 1; i > 0; i--) {
-                    convert1[i] = (unsigned char) strtol(convert2 + (i * 2 - 1), NULL, 16);
-                    convert2[i * 2 - 1] = 0;
-                }
-                convert1[0] = (unsigned char) strtol(convert2, NULL, 16);
-            } else {
-                size = temp.size() / 2;
-                for (i = size - 1; i >= 0; i--) {
-                    convert1[i] = (unsigned char) strtol(convert2 + (i * 2), NULL, 16);
-                    convert2[i * 2] = 0;
-                }
-            }
-            k.N = BN_new();
-            BN_bin2bn(convert1, size, k.N);
-
-        }else if (temp == "Key:") {
-            /*** get Key ***/
-            getline(in,temp);
-            strcpy(convert2, temp.c_str());
-            if (temp.size() % 2) {
-                size = (temp.size() + 1) / 2;
-                for (i = size - 1; i > 0; i--) {
-                    convert1[i] = (unsigned char) strtol(convert2 + (i * 2 - 1), NULL, 16);
-                    convert2[i * 2 - 1] = 0;
-                }
-                convert1[0] = (unsigned char) strtol(convert2, NULL, 16);
-            } else {
-                size = temp.size() / 2;
-                for (i = size - 1; i >= 0; i--) {
-                    convert1[i] = (unsigned char) strtol(convert2 + (i * 2), NULL, 16);
-                    convert2[i * 2] = 0;
-                }
-            }
-            k.k = BN_new();
-            BN_bin2bn(convert1, size, k.k);
-
-        }else if (temp == "Bits:") {
-            /*** get n: ***/
-            getline(in,temp);
-            k.n = strtol(temp.c_str(), NULL, 16);
-
-        }else if (temp == "Identity:"){
-
-            /*** read an identity ***/
-            getline(in,temp);
-            k.identity = temp;
-        }
-    }
-    in.close();
-    //free(convert1);
-    //free(convert2);
+    string temp = "cp " + PKfile + " " + dirName;
+    system(temp.c_str());
+    temp = "cp " + SigFile + " " + dirName;
+    system(temp.c_str());
 }
 
 void dirToLock::readSigFile(string& fileName, string & Sig) {
