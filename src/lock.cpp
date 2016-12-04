@@ -118,7 +118,7 @@ void dirToLock::encryptFiles(){
         aes.setKey(256, key);
 
 
-        output = aes.CBCencrypt(inp.length(), input);
+        output = aes.CBCencrypt(input);
         printf ("%s\n", output);
 
         to << output;

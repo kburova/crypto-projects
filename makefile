@@ -3,7 +3,7 @@ BIN = bin
 INC = include
 OBJ = obj
 SRC = src
-FLAGS = -lssl -lcrypto -I$(INC) -I/usr/local/opt/openssl/include
+FLAGS = -std=c++11 -lssl -lcrypto -I$(INC) -I/usr/local/opt/openssl/include
 DIR = /usr/local/opt/openssl
 MAC = -std=c++11 -lssl -lcrypto
 
