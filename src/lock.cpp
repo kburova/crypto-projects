@@ -77,6 +77,8 @@ void dirToLock::generateAESKeys() {
     fprintf(SharedKeys, "---Macing key---\n");
     BN_print_fp(SharedKeys, macKey);
 
+    fclose(SharedKeys);
+
     //encrypt file
     printf("Encrypting 'SharedKeys'...\n");
     encryptKeysFile();
@@ -85,11 +87,10 @@ void dirToLock::generateAESKeys() {
     printf("Signing 'SharedKeys.enc'...\n\n");
     encFile = fileForKeys + ".enc";
     signFile(encFile);
-    fclose(SharedKeys);
+
 
     string temp = "rm " + fileForKeys;
-
-    //system(temp.c_str());
+    system(temp.c_str());
 }
 
 void dirToLock::signFile(string & file) {
@@ -123,6 +124,7 @@ void dirToLock::encryptKeysFile() {
         fprintf(stderr, "Failed to open file for encrypted shared keys\n");
         exit(1);
     }
+
     // encrypt file
     dirToStr(fileForKeys, message);
     enc.RSAEncrypt(uPKfile, message, cypher);
@@ -212,6 +214,7 @@ void dirToLock::dirToStr(string &d, string &m){
 
     ifstream PK;
     stringstream ss;
+
     PK.open(d);
     if (PK.fail()){
         perror("Error: Couldn't open certificate");
@@ -261,13 +264,13 @@ void dirToLock::verifyPKeys(){
 
 
     //SYSTEM CALLS !!! TO COPY FILES OVER
-    string temp = "cp " + PKfile + " " + dirName;
+    string temp = "cp " + PKfile + " " + dirName + "/LockPK.txt";
     system(temp.c_str());
-    temp = "cp " + SigFile + " " + dirName;
+    temp = "cp " + SigFile + " " + dirName + "/LockSig.txt";
     system(temp.c_str());
-    temp = "cp " + caPKfile + " " + dirName;
+    temp = "cp " + caPKfile + " " + dirName + "/CApk.txt";
     system(temp.c_str());
-    temp = "cp " + caSigFile + " " + dirName;
+    temp = "cp " + caSigFile + " " + dirName + "/CAsig.txt";
     system(temp.c_str());
 }
 
