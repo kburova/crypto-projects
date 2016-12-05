@@ -89,7 +89,7 @@ void dirToLock::generateAESKeys() {
 
     string temp = "rm " + fileForKeys;
 
-    system(temp.c_str());
+    //system(temp.c_str());
 }
 
 void dirToLock::signFile(string & file) {
