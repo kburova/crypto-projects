@@ -75,7 +75,7 @@ void dirToUnlock::decryptKeysFile() {
     // decrypt file
     dirToStr(keyFile, cypher);
     enc.RSADecrypt(SKfile, cypher, message);
-
+    cout << SKfile << endl;
     cout << "Message: "<<message<<endl;
 
     //create SharedKeys file
