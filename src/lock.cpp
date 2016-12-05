@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <cstdlib>
 #include "lock.h"
 #include "sig.h"
 #include "aes.h"
@@ -31,16 +30,6 @@ dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, 
         perror("Couldn't open directory to read files");
         exit(1);
     }
-
-    //delete created files first (for debugging perposes
-//    string temp = "rm " + dirName + "/SharedKeys";
-//    system(temp.c_str());
-//    temp = "rm " + dirName + "/*.enc";
-//    system(temp.c_str());
-//    temp = "rm " + dirName + "/*.tag";
-//    system(temp.c_str());
-//    temp = "rm " + dirName + "/*.sig";
-//    system(temp.c_str());
 
     for (de = readdir(dir); de != NULL; de = readdir(dir)){
 
@@ -270,9 +259,15 @@ void dirToLock::verifyPKeys(){
         cout << "All parties verified successfully..." <<endl;
     }
 
+
+    //SYSTEM CALLS !!! TO COPY FILES OVER
     string temp = "cp " + PKfile + " " + dirName;
     system(temp.c_str());
     temp = "cp " + SigFile + " " + dirName;
+    system(temp.c_str());
+    temp = "cp " + caPKfile + " " + dirName;
+    system(temp.c_str());
+    temp = "cp " + caSigFile + " " + dirName;
     system(temp.c_str());
 }
 

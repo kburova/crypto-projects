@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 class dirToLock{
 
 protected:
@@ -22,7 +21,7 @@ protected:
     struct dirent *de;
     vector <string> dirFiles;
 
-    //requesting party
+    //unlocking party
     string uPKfile;
     string personSig;
     string uSigFile;
@@ -58,10 +57,42 @@ public:
 class dirToUnlock{
 
 protected:
+
+    DIR *dir;
     string dirName;
+    string fileForKeys;
+    struct dirent *de;
+    vector <string> encFiles;
+    vector <string> tagFiles;
+
+    //unlocking party
+    string PKfile;
+    string SKfile;
+    string SigFile;
+    string Sig;
+
+    //locking party
+    string lPKfile;
+    string lSigFile;
+    string lSig;
+
+    //CA
+    string caSigFile;
+    string caPKfile;
+    string caSig;
+
+    BIGNUM *encKey;
+    BIGNUM *macKey;
 
 public:
-    void unlock();
+    dirToUnlock(string& d, string& PK, string& SK, string &S);
+    void reportIdentity();
+    void readSigFile(string& fileName, string & Sig);
+    void dirToStr(string &d, string & m);
+    void verifyPKeys();
+    void decryptFiles();
+    void decryptKeysFile();
+    void verifySharedKeys();
 
 };
 

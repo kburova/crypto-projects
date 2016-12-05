@@ -11,8 +11,8 @@ all: $(BIN)/rsa $(BIN)/aes $(BIN)/mac $(BIN)/sig $(BIN)/lock
 clean:
 	rm -f $(OBJ)/* $(BIN)/*
 
-$(BIN)/lock: $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o $(OBJ)/MAC.o
-	$(CC) -o $(BIN)/lock $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o $(OBJ)/MAC.o $(FLAGS)
+$(BIN)/lock: $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o $(OBJ)/MAC.o $(OBJ)/unlock.o
+	$(CC) -o $(BIN)/lock $(OBJ)/LockDriver.o $(OBJ)/rsa.o $(OBJ)/aes.o $(OBJ)/sig.o $(OBJ)/lock.o $(OBJ)/MAC.o $(OBJ)/unlock.o $(FLAGS)
 
 $(BIN)/rsa: $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(OBJ)/certGen.o $(OBJ)/sig.o
 	$(CC) -o $(BIN)/rsa $(OBJ)/rsaDriver.o $(OBJ)/rsa.o $(OBJ)/KeyGen.o $(OBJ)/certGen.o $(OBJ)/sig.o $(FLAGS)
@@ -58,6 +58,9 @@ $(OBJ)/certGen.o: $(SRC)/certGen.cpp $(INC)/rsa.h
 
 $(OBJ)/lock.o: $(SRC)/lock.cpp $(INC)/lock.h
 	$(CC) -c -o $(OBJ)/lock.o $(SRC)/lock.cpp $(FLAGS)
+
+$(OBJ)/unlock.o: $(SRC)/unlock.cpp $(INC)/lock.h
+	$(CC) -c -o $(OBJ)/unlock.o $(SRC)/unlock.cpp $(FLAGS)
 
 $(OBJ)/MAC.o: $(SRC)/MAC.cpp $(INC)/mac.h
 	$(CC) -c -o $(OBJ)/MAC.o $(SRC)/MAC.cpp $(FLAGS)
