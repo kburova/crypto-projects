@@ -44,8 +44,8 @@ int main(int argc, char** argv){
         dirObj.encryptFiles();
 
     }else{
-        ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/unlockInput");
-        //ifstream in("unlockInput2");
+        //ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/unlockInput");
+        ifstream in("unlockInput2");
         cin.rdbuf(in.rdbuf());
         cout << "Enter path for directory to unlock" << endl;
         cin >> dir;
