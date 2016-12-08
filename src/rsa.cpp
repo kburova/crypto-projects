@@ -1,10 +1,10 @@
-#include<fstream>
-#include<cstdio>
-#include<iostream>
-#include<cstring>
-#include<openssl/bn.h>
-#include<openssl/rand.h>
-#include"rsa.h"
+#include <fstream>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <openssl/bn.h>
+#include <openssl/rand.h>
+#include "rsa.h"
 
 using namespace std;
 
@@ -451,6 +451,7 @@ void RSA_obj::openPublicKeyFile(string& fileName)
 	//free(convert1);
 	//free(convert2);
 
+    in.close();
 	return;
 }
 
@@ -523,5 +524,6 @@ void RSA_obj::openSecretKeyFile(string& fileName)
 	//free(convert1);
 	//free(convert2);
 
+    in.close();
 	return;
 }
