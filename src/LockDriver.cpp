@@ -64,6 +64,7 @@ int main(int argc, char** argv){
         dirObj.verifyPKeys();
         dirObj.verifySharedKeys();
         dirObj.decryptKeysFile();
+        dirObj.decryptFiles();
     }
 
     return 0;

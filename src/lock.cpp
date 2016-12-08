@@ -48,6 +48,7 @@ dirToLock::dirToLock(string& d, string& PK, string& SK, string &S, string &uPK, 
     readSigFile(uS, personSig);
         //CA
     readSigFile(caSIG, caSig);
+    closedir(dir);
 }
 
 void dirToLock::generateAESKeys() {
@@ -117,7 +118,7 @@ void dirToLock::encryptKeysFile() {
 
     RSA_obj enc;
     ofstream encKeys;
-    string message, cypher;
+    string message, cypher, hexMessage;
 
     encKeys.open(fileForKeys + ".enc");
     if (encKeys.fail() ){
@@ -127,7 +128,8 @@ void dirToLock::encryptKeysFile() {
 
     // encrypt file
     dirToStr(fileForKeys, message);
-    enc.RSAEncrypt(uPKfile, message, cypher);
+    hexMessage = strToHexStr(message);
+    enc.RSAEncrypt(uPKfile, hexMessage, cypher);
 
     //create .enc file
     encKeys << cypher;
@@ -205,7 +207,7 @@ void dirToLock::encryptFiles(){
         from.close();
         free(input);
 
-        string temp = "rm "+file;
+        string temp = "rm "+ file;
         system( temp.c_str() );
     }
 
@@ -285,4 +287,31 @@ void dirToLock::readSigFile(string& fileName, string & Sig) {
     in >> Sig;
 
     in.close();
+}
+
+string dirToLock::strToHexStr(string & m){
+
+    char temp[3];
+    stringstream ss;
+    string hexString = "";
+
+    ss.clear();
+    for (int i = 0; i < m.size(); i++){
+        sprintf( temp, "%02x",  (unsigned char)(unsigned int)m[i] );
+        ss << temp;
+    }
+    hexString = ss.str();
+
+    return hexString;
+}
+string dirToLock::hexStrToStr(string & hex){
+
+    string temp, m = "";
+
+    for (int i = 0; i < hex.size()/2; i++){
+        temp = hex.substr(i*2,2);
+        m += strtol(temp.c_str(),NULL,16);
+    }
+
+    return m;
 }

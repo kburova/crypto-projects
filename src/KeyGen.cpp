@@ -139,7 +139,7 @@ void keyGen(const string & PK_file,const string & SK_file,const string & identit
     fprintf(PK, "Key:\n");
     BN_print_fp(PK, e);
     fprintf(PK, "\n");
-    fprintf(PK, "---- END PUBLIC KEY ----\n");
+    fprintf(PK, "---- END PUBLIC KEY ----");
 
 
     printf("Writing Secret Key to a file...\n");
@@ -153,7 +153,7 @@ void keyGen(const string & PK_file,const string & SK_file,const string & identit
     fprintf(SK, "Key:\n");
     BN_print_fp(SK, d);
     fprintf(SK, "\n");
-    fprintf(SK, "---- END SECRET KEY ----\n");
+    fprintf(SK, "---- END SECRET KEY ----");
 
     fclose(PK);
     fclose(SK);

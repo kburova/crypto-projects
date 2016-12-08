@@ -34,7 +34,6 @@ void signCertificate(const string & PK_file, const string & CAsig){
     ss.clear();
     ss << PK.rdbuf();
     messageToSig = ss.str();
-
     PK.close();
 
     /*** call Signature function to sign public key file ***/

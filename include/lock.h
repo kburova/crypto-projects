@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <openssl/bn.h>
+#include <set>
 
 using namespace std;
 
@@ -50,7 +51,8 @@ public:
     void encryptFiles();
     void encryptKeysFile();
     void signFile(string & file);
-
+    string strToHexStr(string & m);
+    string hexStrToStr(string & hex);
 };
 
 
@@ -62,8 +64,8 @@ protected:
     string dirName;
     string fileForKeys;
     struct dirent *de;
-    vector <string> encFiles;
-    vector <string> tagFiles;
+    set <string> encFiles;
+    set <string> tagFiles;
 
     //unlocking party
     string PKfile;
@@ -90,10 +92,12 @@ public:
     void readSigFile(string& fileName, string & Sig);
     void dirToStr(string &d, string & m);
     void verifyPKeys();
+    void readAESKeys();
     void decryptFiles();
     void decryptKeysFile();
     void verifySharedKeys();
-
+    string strToHexStr(string & m);
+    string hexStrToStr(string & hex);
 };
 
 #endif //LOCK_H_H
