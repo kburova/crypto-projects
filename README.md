@@ -26,7 +26,191 @@ All header file are found in the `include/` folder.
 
 All supporting files are found in the `files/` folder...
 
-## Programs
+
+# Assignment 3 ( description for assignmnet 2 was moved below )
+## Part 1. Signature gen
+
+## Part 2. Certificate/Private Key Generating
+This part is very similar to key gen from previous assignment. Except, we modified the way public and secret keys look. Also there is signature added for Public key to make it a certificate. We were allowed to have certificate chain of size 1, thus, we have pre-generated folder with CA files that we use to sign keys for Locking and Unlocking Parties.
+This is how you would run this part:
+    
+    ./bin/rsa 
+    
+ This is the resulting promt and output during execution, we used KeyGenPart folder to store generated files:
+ 
+          Choose a task: 
+        1  -  Key Generation
+        2  -  RSA Encryption
+        3  -  RSA Decryption
+
+            1                
+        Enter path to Public Key File
+            KeyGenPart/PK.txt
+        Enter path to Secret Key File
+            KeyGenPart/SK.txt 
+        Enter your identity
+            Alice
+        Is it self signed? 1(yes), 0(no)
+            0
+
+        Enter security parameter n: 
+            512
+        Generating p...
+        Prime p is found...
+        Generating q...
+        Prime q is found...
+        e > 1 is chosen...
+        d is calculated...
+        Writing Public Key to a file...
+        Writing Secret Key to a file...
+        Signing sertificate...
+        Enter signature file: 
+            KeyGenPart/Sig.txt
+
+(If 1 is chosen for signing then PK will be signed with Secret Key that was just generated)
+This is how new Public Key looks (KeyGenPart/PK.txt):
+
+        Identity:
+        Alice
+
+        --- BEGIN PUBLIC KEY ---
+        N:  
+        BA9FCA4A473E1D3379597C0A3A4C19219D46BFF16AFFB09A68EE8B6CEE71E3B8E43A1E9667FFB11705FB40432132A51007E24DF3AB3D4C75EFBF6BBF1D38567CD63E6C77381333A9103272E87C685D8753E6A536472FA0584341BDEA3586D63FA9024E240668CE1329F7F084FBBCE18510FC41603EB29F4589E2637218793139
+        Bits:
+        200
+        Key:
+        10001
+        ---- END PUBLIC KEY ----
+        
+This is Private Key (KeyGenPart/SK.txt):
+
+        --- BEGIN SECRET KEY ---
+        N:  
+        BA9FCA4A473E1D3379597C0A3A4C19219D46BFF16AFFB09A68EE8B6CEE71E3B8E43A1E9667FFB11705FB40432132A51007E24DF3AB3D4C75EFBF6BBF1D38567CD63E6C77381333A9103272E87C685D8753E6A536472FA0584341BDEA3586D63FA9024E240668CE1329F7F084FBBCE18510FC41603EB29F4589E2637218793139
+        Bits:
+        200
+        Key: 
+        38D98C49EC41E3AB568007E525B520C2B8A260BE2E160DBA3BD4CEEC3406C5940112235735FF11F72D7F48282AE8BE978F8F44A7C1B63EA07E94154276A83ECFEAFF7F08251CEECE9F366E03BF57CA8F36D8BEA2BBC3FBD9F8A996373511707C7BCE2A3D1E43F4B943335F4B41C4DB3361375421627D378FD270052F2C0B4E01
+        ---- END SECRET KEY ----
+        
+Signature file has only signature in hex ( KeyGenPart/Sig.txt ):
+               
+ 
+            67F8DF023C7AAE75E97919EEC51D12D0070106FC4091BAA4875F912C59925BE6781B42C5CDB0513EEADC74122B459AB51305EC7ECFF9FE5843BF8D8E0CB93B781A440AB677A39FFA8054ACC2446B698178C0719F3A58383729F740FCB7BD5BA668310FF6D480785451EC9BC8DE3FA13263D4AB27DB81B0AA3871416CC37E02DF671124B79C518A2134633BE07326C16FAF14390BA9F50144E88B6BBA94598F2FD021EE2D409E50DADEAF6F5A69786D0996E81F56F88B0AE5167B71A38617005A1E0656A7405912DE72787EF276FBF8FE772FE5F50C54FD7682AD5274F5966F6606910C73FA9393452EF0575222AE4681A240DFD6DDF9DA6A1E82404CDA08B219
+        
+## Part 3. Certificate/Private Key Generating
+
+### !!! Please use one word for identity, there is a liitle problem with the way we read from file if identity consists of more words.
+
+### !!! We have input2 and unlockInput2 files with pathes for input, so you can uncomment [line 18](https://github.com/pendgaft/cosc483-pa23-27/blob/master/src/LockDriver.cpp#L18) and [line 48](https://github.com/pendgaft/cosc483-pa23-27/blob/master/src/LockDriver.cpp#L48) for automated run.
+
+For this part we pre-generated these folders:
+
+    LockingPartyFiles/
+        LockPK.txt  LockSK.txt  LockSig.txt
+        
+    UnlockingPartyFiles/
+        UnlockPK.txt  UnlockSK.txt  UnlockSig.txt
+        
+    CAfiles/
+        CApk.txt  CAsig.txt CAsk.txt
+        
+We also created a folder to encrypt that has following files (with hex encode strings of real text, you can paste it to hexToStr converter online and check):
+    
+    DorectoryToLock/
+        a.txt b.txt c.txt
+
+### This is how we run part a):
+
+    ./bin/lock
+    
+The resulting promt and output is:
+
+    Do you lock or unlock directory? Type 1 (lock) or 0 (unlock)
+    1
+    Enter path for directory to lock
+        /DirectoryToLock
+    Enter path for locking party Public Key
+        /LockingPartyFiles/LockPK.txt
+    Enter path for locking party Secret Key
+        /LockingPartyFiles/LockSK.txt
+    Enter path for locking party signature
+        /LockingPartyFiles/LockSig.txt
+    Enter path for unlocking party Public Key
+        /UnlockingPartyFiles/UnlockPK.txt
+    Enter path for unlocking party signature
+        /UnlockingPartyFiles/UnlockSig.txt
+    Enter path for CA's Public Key
+        /CAfiles/CApk.txt
+    Enter path for CA's signature
+        /CAfiles/CAsig.txt
+
+    Verifying CA...
+    Verifying requesting party...
+    Verifying locking party...
+    All parties verified successfully...
+    
+    Generating 'SharedKeys'...
+    Encrypting 'SharedKeys'...
+    Signing 'SharedKeys.enc'...
+
+    Encryptitng 'a.txt' ...
+    Generating tag...
+    Encryptitng 'b.txt' ...
+    Generating tag...
+    Encryptitng 'c.txt' ...
+    Generating tag...
+        
+DirectoryToLock looks this way now:
+
+    DirectoryToLock/
+        CApk.txt           LockPK.txt         SharedKeys.enc     a.txt.enc          b.txt.enc          c.txt.enc
+        CAsig.txt          LockSig.txt        SharedKeys.enc.sig a.txt.tag          b.txt.tag          c.txt.tag
+        
+### This is how we run part b): 
+
+Now we run the same command for unlocking, but we choose 0 on promt to unlock the same folder
+
+    Do you lock or unlock directory? Type 1 (lock) or 0 (unlock)
+        0
+    Enter path for directory to unlock
+        /DirectoryToLock
+    Enter path for unlocking party Public Key
+        /UnlockingPartyFiles/UnlockPK.txt
+    Enter path for unlocking party Secret Key
+        /UnlockingPartyFiles/UnlockSK.txt
+    Enter path for unlocking party signature
+        /UnlockingPartyFiles/UnlockSig.txt
+
+    Verifying CA...Verifying unlocking party...
+    Verifying locking party...
+    All parties verified successfully...
+
+    Locker party identity is...Alice
+    CA identity is...CAuthority
+
+    SharedKeys.enc is verified...
+    Shared Keys read...
+    
+    a.txt.tag and a.txt.enc are verified
+    decrypt a.txt
+    b.txt.tag and b.txt.enc are verified
+    decrypt b.txt
+    c.txt.tag and c.txt.enc are verified
+    decrypt c.txt
+    
+Resulting directory again is:
+    
+    DorectoryToLock/
+        a.txt b.txt c.txt
+        
+### !!! The only differens in file contents is that they are upper case hex strings now, but it doesn't change their values. When we feed them to hexToStr converter we get the same text strings back.
+
+### !!! If files get altereted decryption will not work, there might be an error message, for example if identity on public key is changed, if key is altered itself program can simply crush...sorry
+
+------------------------------------------------------------------------------------------------------------------------------------------
+# Assignment 2 
+
 AES can be ran with
 
     bin/aes [MODE] [OPTION] [KEY_FILE] [IMPUT_FILE] [OUTPUT_FILE]
@@ -34,7 +218,9 @@ An example mignt be
 
     bin/aes -cbc -e files/key.txt files/message.txt files/cypher.txt
     bin/aes -cbc -d files/key.txt files/cypher.txt files/message2.txt
-These two commands would encrypt `-e` the message `files/message.txt` using CBC `-cbc` using the key in file `files/key.txt` and placing the cypher in `files/cypher.txt`.  Decrypting would be similar only using the `-d` flag and the input file this time should be the cypher file `files/cypher.txt` and the output file will be the resulting message `files/message2.txt`.  YOu can get a help message with a discription of all the flags and modes using the `--help` flag.
+    
+These two commands would encrypt `-e` the message `files/message.txt` 
+using CBC `-cbc` using the key in file `files/key.txt` and placing the cypher in `files/cypher.txt`.  Decrypting would be similar only using the `-d` flag and the input file this time should be the cypher file `files/cypher.txt` and the output file will be the resulting message `files/message2.txt`.  YOu can get a help message with a discription of all the flags and modes using the `--help` flag.
 
 ------
 
