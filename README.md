@@ -27,7 +27,7 @@ All header file are found in the `include/` folder.
 All supporting files are found in the `files/` folder...
 
 
-# Assignment 3 ( description for assignmnet 2 was moved below )
+# Assignment 3 ( description for the assignment 2 was moved below )
 ## Part 1. Signature gen
 
 To run signature gen type this:
