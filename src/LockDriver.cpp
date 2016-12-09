@@ -15,7 +15,7 @@ int main(int argc, char** argv){
 
     if (action) {
         //ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/input");
-        ifstream in("input2");
+        //ifstream in("input2");
         cin.rdbuf(in.rdbuf());
 
         cout << "Enter path for directory to lock" << endl;
@@ -45,7 +45,7 @@ int main(int argc, char** argv){
 
     }else{
         //ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/unlockInput");
-        ifstream in("unlockInput2");
+        //ifstream in("unlockInput2");
         cin.rdbuf(in.rdbuf());
         cout << "Enter path for directory to unlock" << endl;
         cin >> dir;
