@@ -140,12 +140,15 @@ void dirToLock::encryptFiles(){
 
     ifstream from;
     ofstream to, tFile;
-    stringstream ss;
     string inp;
     string temp, tag;
-    char *eKey;
+    char *eKey ;
     char *output;
     char *input;
+    eKey = BN_bn2hex(encKey);
+    AES aes;
+    aes.setKey(eKey);
+    string mKey( BN_bn2hex(macKey) );
 
     for (string file : dirFiles) {
 
@@ -170,26 +173,18 @@ void dirToLock::encryptFiles(){
             exit(1);
         }
 
-        ss.clear();
-        ss << from.rdbuf();
-
         // convert c++ string to c string for encryption part
-        inp = ss.str();
+        from >> inp;
         input = (char*) malloc(sizeof(char) * inp.size() + 1);
         memcpy(input, inp.c_str(), inp.size());
         input[inp.size()] = '\0';
 
         //Encrytion of the file
-        AES aes;
-        eKey = BN_bn2hex(encKey);
-        aes.setKey(eKey);
         output = aes.CBCencrypt(input);
         to << output;
         to.close();
 
         //Taging encrypted file
-        eKey = BN_bn2hex(macKey);
-        string mKey(eKey);
         string mInput(output);
         int size = mInput.size();
 
@@ -206,6 +201,7 @@ void dirToLock::encryptFiles(){
         tFile.close();
         from.close();
         free(input);
+        free(output);
 
         string temp = "rm "+ file;
         system( temp.c_str() );
