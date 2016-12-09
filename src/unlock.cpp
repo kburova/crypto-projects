@@ -54,7 +54,7 @@ void dirToUnlock::verifySharedKeys() {
     }
 
     string tmp = "rm " + keySigFile;
-   // system(tmp.c_str());
+    system(tmp.c_str());
 }
 
 
@@ -85,7 +85,17 @@ void dirToUnlock::decryptKeysFile() {
     readAESKeys();
 
     string temp = "rm " + fileForKeys;
-    //system(temp);
+    system(temp.c_str());
+    temp = "rm " + keyFile;
+    system(temp.c_str());
+    temp = "rm " + lPKfile;
+    system(temp.c_str());
+    temp = "rm " + lSigFile;
+    system(temp.c_str());
+    temp = "rm " + caPKfile;
+    system(temp.c_str());
+    temp = "rm " +caSigFile;
+    system(temp.c_str());
 }
 void dirToUnlock::decryptFiles(){
 
@@ -178,19 +188,22 @@ void dirToUnlock::decryptFiles(){
             exit(1);
         }
 
-        cout << "decrypt here... " << endl;
+        cout << "decrypt " <<origFile << endl;
         // decrypt file
         out = aes.CBCdecrypt(messForDec);
         orig << out;
 
-
-        // RM files here...................
         free(messForDec);
         free(out);
 
         tag.close();
         enc.close();
         orig.close();
+
+        temp = "rm " + dirName+ "/" + origFile + ".tag";
+        system(temp.c_str());
+        temp = "rm " + dirName+ "/" + origFile + ".enc";
+        system(temp.c_str());
     }
 
     free (eKey);
@@ -242,14 +255,14 @@ void dirToUnlock::reportIdentity(){
         }
     }
     capk.close();
-    cout <<endl;
+    cout << endl;
 }
 void dirToUnlock::verifyPKeys(){
 
     bool client = false;
     bool locker = false;
     bool CA = false;
-    string message;
+    string message,temp;
 
     printf("Verifying CA...");
     dirToStr(caPKfile, message);
@@ -279,15 +292,7 @@ void dirToUnlock::verifyPKeys(){
         cout << "All parties verified successfully..." <<endl<<endl;
     }
 
-    // need to delete files here instead
-//    string temp = "rm " + lPKfile;
-//    system(temp.c_str());
-//    temp = "rm " + lSigFile;
-//    system(temp.c_str());
-//    string temp = "rm " + caPKfile;
-//    system(temp.c_str());
-//    temp = "rm " +caSigFile;
-//    system(temp.c_str());
+    reportIdentity();
 }
 
 void dirToUnlock::readSigFile(string& fileName, string & Sig) {

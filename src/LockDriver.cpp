@@ -14,8 +14,8 @@ int main(int argc, char** argv){
     cin >> action;
 
     if (action) {
-        ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/input");
-        //ifstream in("input2");
+        //ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/input");
+        ifstream in("input2");
         cin.rdbuf(in.rdbuf());
 
         cout << "Enter path for directory to lock" << endl;
@@ -36,16 +36,16 @@ int main(int argc, char** argv){
         cin >> caPK;
         cout << "Enter path for CA's signature" << endl;
         cin >> caSIG;
-
         cout << endl;
+
         dirToLock dirObj(dir, PK, SK, SIG, userPK, userSIG, caPK, caSIG);
         dirObj.verifyPKeys();
         dirObj.generateAESKeys();
         dirObj.encryptFiles();
 
     }else{
-        ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/unlockInput");
-        //ifstream in("unlockInput2");
+        //ifstream in("/Users/kseniaburova/Documents/school/Fall2016/cs483/Prog2/unlockInput");
+        ifstream in("unlockInput2");
         cin.rdbuf(in.rdbuf());
         cout << "Enter path for directory to unlock" << endl;
         cin >> dir;
@@ -55,12 +55,9 @@ int main(int argc, char** argv){
         cin >> SK;
         cout << "Enter path for unlocking party signature" << endl;
         cin >> SIG;
-
         cout<<endl;
-        // cout << dir <<endl <<PK <<endl <<SK << endl << SIG <<endl;
+
         dirToUnlock dirObj(dir, PK, SK, SIG);
-        dirObj.verifyPKeys();
-        dirObj.reportIdentity();
         dirObj.verifyPKeys();
         dirObj.verifySharedKeys();
         dirObj.decryptKeysFile();
