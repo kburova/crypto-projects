@@ -39,7 +39,6 @@ void signCertificate(const string & PK_file, const string & CAsig){
     /*** call Signature function to sign public key file ***/
     sig(CAsig, messageToSig, signature);
     SF << signature;
-    cout <<"Sig: "<< signature <<endl;
     SF.close();
 
 }
