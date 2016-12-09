@@ -30,6 +30,26 @@ All supporting files are found in the `files/` folder...
 # Assignment 3 ( description for assignmnet 2 was moved below )
 ## Part 1. Signature gen
 
+To run signature gen type this:
+       
+     ./bin/sig -s [Private (or public) key_file][message_to_sign_file][signature_file]
+
+There is no std output here.
+
+To verify signature type same command with another flag:
+
+     ./bin/sig -v [Public (or private) key_file][message_to_sign_file][signature_file]
+     
+There is going to be output:
+    
+        Signature Verified
+        
+   or
+   
+        Signature did not verify
+       
+#### !!! If same key is used for both, program will segfault on verifying part
+
 ## Part 2. Certificate/Private Key Generating
 This part is very similar to key gen from previous assignment. Except, we modified the way public and secret keys look. Also there is signature added for Public key to make it a certificate. We were allowed to have certificate chain of size 1, thus, we have pre-generated folder with CA files that we use to sign keys for Locking and Unlocking Parties.
 This is how you would run this part:
